@@ -1,0 +1,1 @@
+# No outputs required for firewall rule creation per requirements

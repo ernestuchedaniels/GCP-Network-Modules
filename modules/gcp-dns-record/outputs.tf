@@ -1,0 +1,1 @@
+# No outputs required for DNS record creation per requirements
