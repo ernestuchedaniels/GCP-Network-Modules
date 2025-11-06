@@ -1,0 +1,41 @@
+# Ignore compiled files
+*.log
+*.pyc
+*.o
+*.class
+
+# Ignore environment files
+.env
+*.env
+
+# Ignore local configuration
+config/local.json
+settings.yaml
+
+# Ignore system or IDE files
+.DS_Store
+.vscode/
+.idea/
+
+# Ignore build artifacts
+dist/
+build/
+__pycache__/
+
+# Ignore credentials
+secrets.json
+aws_credentials.txt
+
+# Ignore Terraform local state and working directories
+.terraform/
+.terraform.tfstate
+.terraform.tfstate.*
+terraform.tfstate
+terraform.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+
