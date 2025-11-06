@@ -1,6 +1,6 @@
 output "spoke_self_link" {
   description = "The self-link of the NCC spoke"
-  value       = google_network_connectivity_spoke.spoke.name
+  value       = google_network_connectivity_spoke.spoke.id
 }
 
 output "spoke_name" {
