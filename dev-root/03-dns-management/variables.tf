@@ -1,11 +1,19 @@
 variable "onprem_dns_server_1" {
   description = "Primary on-premises DNS server IP"
   type        = string
-  default     = "192.168.1.10"
 }
 
 variable "onprem_dns_server_2" {
   description = "Secondary on-premises DNS server IP"
   type        = string
-  default     = "192.168.1.11"
+}
+
+variable "dns_records" {
+  description = "Map of DNS records to create"
+  type = map(object({
+    name    = string
+    type    = string
+    ttl     = number
+    rrdatas = list(string)
+  }))
 }

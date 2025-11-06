@@ -8,7 +8,7 @@ terraform {
 }
 
 locals {
-  environment = "prod"
+  environment = "dev"
 }
 
 # Read outputs from previous stages
@@ -26,66 +26,21 @@ data "terraform_remote_state" "networking_core" {
   }
 }
 
-# Allow Internal Traffic
-module "allow_internal" {
+# Create Firewall Rules
+module "firewall_rules" {
   source = "../../modules/gcp-firewall-rule"
   
-  project_id     = data.terraform_remote_state.project_setup.outputs.host_project_id
-  rule_name      = "${local.environment}-allow-internal"
-  network_link   = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
-  direction      = "INGRESS"
-  priority       = 1000
-  action         = "allow"
-  protocol       = "all"
-  source_ranges  = [var.vpc_cidr_range]
-  description    = "Allow internal traffic within VPC"
-}
-
-# Allow SSH Access
-module "allow_ssh" {
-  source = "../../modules/gcp-firewall-rule"
+  for_each = var.firewall_rules
   
   project_id     = data.terraform_remote_state.project_setup.outputs.host_project_id
-  rule_name      = "${local.environment}-allow-ssh"
+  rule_name      = each.value.name
   network_link   = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
-  direction      = "INGRESS"
-  priority       = 1000
-  action         = "allow"
-  protocol       = "tcp"
-  ports          = ["22"]
-  source_ranges  = var.ssh_source_ranges
-  target_tags    = ["ssh-enabled"]
-  description    = "Allow SSH access"
-}
-
-# Allow HTTP/HTTPS
-module "allow_web" {
-  source = "../../modules/gcp-firewall-rule"
-  
-  project_id     = data.terraform_remote_state.project_setup.outputs.host_project_id
-  rule_name      = "${local.environment}-allow-web"
-  network_link   = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
-  direction      = "INGRESS"
-  priority       = 1000
-  action         = "allow"
-  protocol       = "tcp"
-  ports          = ["80", "443"]
-  source_ranges  = ["0.0.0.0/0"]
-  target_tags    = ["web-server"]
-  description    = "Allow HTTP/HTTPS traffic"
-}
-
-# Deny All Other Traffic (Explicit Deny)
-module "deny_all" {
-  source = "../../modules/gcp-firewall-rule"
-  
-  project_id     = data.terraform_remote_state.project_setup.outputs.host_project_id
-  rule_name      = "${local.environment}-deny-all"
-  network_link   = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
-  direction      = "INGRESS"
-  priority       = 65534
-  action         = "deny"
-  protocol       = "all"
-  source_ranges  = ["0.0.0.0/0"]
-  description    = "Explicit deny all other traffic"
+  direction      = each.value.direction
+  priority       = each.value.priority
+  action         = each.value.action
+  protocol       = each.value.protocol
+  ports          = each.value.ports
+  source_ranges  = each.value.source_ranges
+  target_tags    = each.value.target_tags
+  description    = each.value.description
 }

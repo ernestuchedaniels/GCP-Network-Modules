@@ -30,26 +30,19 @@ module "main_vpc" {
   description             = "Shared VPC for ${local.environment} environment"
 }
 
-# Create Primary Subnet
-module "primary_subnet" {
+# Create Subnets
+module "subnets" {
   source = "../../modules/gcp-subnet"
   
-  project_id                = data.terraform_remote_state.project_setup.outputs.host_project_id
-  subnet_name               = "${local.environment}-primary-subnet"
-  cidr_block                = var.primary_dev_cidr
-  region                    = var.region
-  vpc_link                  = module.main_vpc.vpc_self_link
-  private_ip_google_access  = true
-  description               = "Primary subnet for ${local.environment} environment"
+  for_each = var.subnets
   
-  secondary_ranges = [
-    {
-      range_name    = "pods"
-      ip_cidr_range = var.pods_cidr
-    },
-    {
-      range_name    = "services"
-      ip_cidr_range = var.services_cidr
-    }
-  ]
+  project_id                = data.terraform_remote_state.project_setup.outputs.host_project_id
+  subnet_name               = each.value.name
+  cidr_block                = each.value.cidr_block
+  region                    = each.value.region
+  vpc_link                  = module.main_vpc.vpc_self_link
+  private_ip_google_access  = each.value.private_ip_google_access
+  description               = each.value.description
+  
+  secondary_ranges = each.value.secondary_ranges
 }

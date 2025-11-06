@@ -26,20 +26,20 @@ data "terraform_remote_state" "service_projects" {
   }
 }
 
-# Create PSC Endpoint
-module "psc_endpoint" {
+# Create PSC Endpoints
+module "psc_endpoints" {
   source = "../../modules/gcp-psc-endpoint"
   
-  project_id             = data.terraform_remote_state.service_projects.outputs.app_service_project_id
-  endpoint_name          = "${local.environment}-psc-endpoint"
-  subnet_link            = data.terraform_remote_state.networking_core.outputs.primary_subnet_link
-  service_attachment_uri = var.service_attachment_uri
-  region                 = var.region
-  description            = "PSC endpoint for ${local.environment} environment"
+  for_each = var.psc_endpoints
   
-  labels = {
-    environment = local.environment
-  }
+  project_id             = data.terraform_remote_state.service_projects.outputs.app_service_project_id
+  endpoint_name          = each.value.name
+  subnet_link            = each.value.subnet_link
+  service_attachment_uri = each.value.service_attachment_uri
+  region                 = each.value.region
+  description            = each.value.description
+  
+  labels = each.value.labels
 }
 
 # Create VPC Peering (if needed)

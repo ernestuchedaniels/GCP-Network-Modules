@@ -1,22 +1,14 @@
-variable "primary_prod_cidr" {
-  description = "CIDR block for primary subnet"
-  type        = string
-}
-
-variable "region" {
-  description = "GCP region"
-  type        = string
-  default     = "us-central1"
-}
-
-variable "pods_cidr" {
-  description = "CIDR block for pods secondary range"
-  type        = string
-  default     = "10.31.0.0/16"
-}
-
-variable "services_cidr" {
-  description = "CIDR block for services secondary range"
-  type        = string
-  default     = "10.32.0.0/16"
+variable "subnets" {
+  description = "Map of subnets to create"
+  type = map(object({
+    name                     = string
+    cidr_block              = string
+    region                  = string
+    private_ip_google_access = bool
+    description             = string
+    secondary_ranges = list(object({
+      range_name    = string
+      ip_cidr_range = string
+    }))
+  }))
 }

@@ -1,11 +1,14 @@
-variable "vpc_cidr_range" {
-  description = "CIDR range of the VPC for internal traffic"
-  type        = string
-  default     = "10.20.0.0/16"
-}
-
-variable "ssh_source_ranges" {
-  description = "Source IP ranges allowed for SSH access"
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
+variable "firewall_rules" {
+  description = "Map of firewall rules to create"
+  type = map(object({
+    name          = string
+    direction     = string
+    priority      = number
+    action        = string
+    protocol      = string
+    ports         = list(string)
+    source_ranges = list(string)
+    target_tags   = list(string)
+    description   = string
+  }))
 }

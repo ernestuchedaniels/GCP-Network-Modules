@@ -44,15 +44,17 @@ module "private_dns_zone" {
 }
 
 # Create DNS Records
-module "api_dns_record" {
+module "dns_records" {
   source = "../../modules/gcp-dns-record"
+  
+  for_each = var.dns_records
   
   project_id   = data.terraform_remote_state.project_setup.outputs.host_project_id
   zone_id      = module.private_dns_zone.zone_id
-  record_name  = "api.${local.environment}.internal."
-  record_type  = "A"
-  ttl          = 300
-  rrdatas      = ["10.20.1.10"]
+  record_name  = each.value.name
+  record_type  = each.value.type
+  ttl          = each.value.ttl
+  rrdatas      = each.value.rrdatas
 }
 
 # Create DNS Forwarding for On-Premises Integration

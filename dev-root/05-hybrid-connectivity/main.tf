@@ -50,15 +50,17 @@ module "ncc_hub" {
   }
 }
 
-# Create Interconnect VLAN Attachment
-module "interconnect_vlan" {
+# Create Interconnect VLAN Attachments
+module "interconnect_vlans" {
   source = "../../modules/gcp-interconnect-vlan"
+  
+  for_each = var.vlan_attachments
   
   project_id        = data.terraform_remote_state.project_setup.outputs.host_project_id
   router_name       = module.cloud_router.router_name
-  region            = var.region
-  interconnect_name = "${local.environment}-vlan-attachment"
-  type              = "PARTNER"
-  bandwidth         = var.bandwidth
-  description       = "VLAN attachment for ${local.environment} environment"
+  region            = each.value.region
+  interconnect_name = each.value.name
+  type              = each.value.type
+  bandwidth         = each.value.bandwidth
+  description       = each.value.description
 }

@@ -1,15 +1,16 @@
-variable "service_attachment_uri" {
-  description = "URI of the service attachment for PSC"
-  type        = string
+variable "psc_endpoints" {
+  description = "Map of PSC endpoints to create"
+  type = map(object({
+    name                   = string
+    subnet_link           = string
+    service_attachment_uri = string
+    region                = string
+    description           = string
+    labels                = map(string)
+  }))
 }
 
 variable "peering_network_url" {
-  description = "URL of the network to peer with"
+  description = "URL of the peer network for VPC peering"
   type        = string
-}
-
-variable "region" {
-  description = "GCP region"
-  type        = string
-  default     = "us-central1"
 }
