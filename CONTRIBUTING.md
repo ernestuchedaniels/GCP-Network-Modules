@@ -114,7 +114,23 @@ subnets = {
 **On Pull Request:**
 - Code validation (fmt, validate)
 - Speculative plans in TFE
-- PR comments with plan links
+- Automated PR comments with change details and plan links
+
+**Example PR Comment:**
+```
+🔍 Speculative Plan Triggered for `dev-02-networking-core`
+
+**Changes in this PR:**
+- feat: add new subnet for web tier
+- fix: update firewall rules for HTTPS
+- docs: update subnet documentation
+
+📋 **View Results:**
+- [Terraform Cloud Workspace](https://app.terraform.io/app/Visa-replica/workspaces/dev-02-networking-core)
+- [Plan Details](https://app.terraform.io/app/Visa-replica/workspaces/dev-02-networking-core/runs)
+
+⏱️ Plan triggered at: 2025-01-XX...
+```
 
 **On Merge to Main:**
 - Apply runs in TFE
