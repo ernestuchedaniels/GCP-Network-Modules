@@ -11,4 +11,5 @@ variable "billing_account" {
 variable "org_id" {
   description = "The organization ID"
   type        = string
+  default     = null
 }
