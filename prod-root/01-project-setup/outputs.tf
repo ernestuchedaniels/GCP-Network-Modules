@@ -1,9 +1,10 @@
 output "host_project_id" {
   description = "The host project ID"
-  value       = module.host_project.project_id
+  value       = var.host_project_id
 }
 
-output "host_project_number" {
-  description = "The host project number"
-  value       = module.host_project.project_number
-}
+# Shared VPC output - commented out for testing
+# output "shared_vpc_host_project" {
+#   description = "The shared VPC host project resource"
+#   value       = google_compute_shared_vpc_host_project.shared_vpc_host.project
+# }
