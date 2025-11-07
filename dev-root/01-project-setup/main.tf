@@ -28,8 +28,8 @@ module "host_project" {
   org_id          = var.org_id
 
   labels = {
-    environment = local.environment
-    purpose     = "shared_vpc_host"
+    environment = "dev"
+    purpose     = "sharedvpc"
   }
 }
 
