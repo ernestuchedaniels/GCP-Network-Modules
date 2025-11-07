@@ -86,14 +86,15 @@ jobs:
           
           if [ -d "$FULL_PATH" ]; then
             cd "$FULL_PATH"
-            terraform init -backend=false
             
             # Set dummy variables for validation
             export TF_VAR_host_project_id="dummy-project"
             export TF_VAR_billing_account_id="dummy-billing"
             export TF_VAR_org_id="dummy-org"
             
-            terraform validate
+            # Initialize without backend but get modules
+            terraform init -backend=false -get=true
+            terraform validate -no-color
           fi
 
   speculative-plan:
