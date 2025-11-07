@@ -3,7 +3,7 @@ variable "host_project_id" {
   type        = string
 }
 
-variable "billing_account" {
+variable "billing_account_id" {
   description = "The billing account ID"
   type        = string
 }
