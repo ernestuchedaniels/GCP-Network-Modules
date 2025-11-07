@@ -149,20 +149,15 @@ jobs:
             cat plan_summary.md
           fi
 
-      - name: Comment PR with Plan Results
-        uses: actions/github-script@v7
-        if: hashFiles('plan_summary.md') != ''
-        with:
-          script: |
-            const fs = require('fs');
-            const planSummary = fs.readFileSync('plan_summary.md', 'utf8');
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: planSummary
-            });
+      - name: Display Plan Results
+        run: |
+          if [ -f "plan_summary.md" ]; then
+            echo "=== TERRAFORM PLAN SUMMARY ==="
+            cat plan_summary.md
+            echo "=============================="
+          else
+            echo "No plan summary available"
+          fi
 
   apply-on-merge:
     needs: [detect-changes]
