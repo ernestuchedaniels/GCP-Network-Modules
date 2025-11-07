@@ -46,7 +46,7 @@ resource "tfe_workspace" "network_workspaces" {
   
   working_directory = "${each.value.environment}-root/${each.value.stage}"
   terraform_version = "1.13.5"
-  file_triggers_enabled = true
+  execution_mode    = "remote"
   
   vcs_repo {
     identifier     = var.github_repo
