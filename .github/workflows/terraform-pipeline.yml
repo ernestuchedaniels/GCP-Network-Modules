@@ -93,15 +93,25 @@ jobs:
       - uses: actions/checkout@v4
       - name: Trigger Speculative Plan
         run: |
-          # Get workspace ID
-          WORKSPACE_ID=$(curl -s \
+          # Get workspace ID with error handling
+          echo "Getting workspace ID for: ${{ matrix.workspace }}"
+          WORKSPACE_RESPONSE=$(curl -s \
             --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
             --header "Content-Type: application/vnd.api+json" \
-            "https://app.terraform.io/api/v2/organizations/Visa-replica/workspaces/${{ matrix.workspace }}" | \
-            jq -r '.data.id')
+            "https://app.terraform.io/api/v2/organizations/Visa-replica/workspaces/${{ matrix.workspace }}")
           
-          # Trigger speculative plan
-          curl \
+          echo "Workspace API response: $WORKSPACE_RESPONSE"
+          WORKSPACE_ID=$(echo "$WORKSPACE_RESPONSE" | jq -r '.data.id')
+          
+          if [ "$WORKSPACE_ID" = "null" ] || [ -z "$WORKSPACE_ID" ]; then
+            echo "Error: Could not get workspace ID"
+            exit 1
+          fi
+          
+          echo "Workspace ID: $WORKSPACE_ID"
+          
+          # Trigger speculative plan with error handling
+          PLAN_RESPONSE=$(curl -s -w "HTTP_STATUS:%{http_code}" \
             --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
             --header "Content-Type: application/vnd.api+json" \
             --request POST \
@@ -122,38 +132,25 @@ jobs:
                 }
               }
             }" \
-            https://app.terraform.io/api/v2/runs
+            https://app.terraform.io/api/v2/runs)
+          
+          HTTP_STATUS=$(echo "$PLAN_RESPONSE" | grep -o 'HTTP_STATUS:[0-9]*' | cut -d: -f2)
+          RESPONSE_BODY=$(echo "$PLAN_RESPONSE" | sed 's/HTTP_STATUS:[0-9]*$//')
+          
+          echo "HTTP Status: $HTTP_STATUS"
+          echo "Response: $RESPONSE_BODY"
+          
+          if [ "$HTTP_STATUS" -ge 400 ]; then
+            echo "Error: TFE API call failed with status $HTTP_STATUS"
+            exit 1
+          fi
+          
+          echo "Speculative plan triggered successfully"
 
-      - name: Get commit messages
-        id: commits
+      - name: Output Plan Details
         run: |
-          COMMITS=$(git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.sha }} --pretty=format:"- %s" | head -5)
-          echo "messages<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Comment PR with Plan Link
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const commitMessages = `${{ steps.commits.outputs.messages }}`;
-            const body = `🔍 **Speculative Plan Triggered for \`${{ matrix.workspace }}\`**
-            
-            **Changes in this PR:**
-            ${commitMessages}
-            
-            📋 **View Results:**
-            - [Terraform Cloud Workspace](https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }})
-            - [Plan Details](https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }}/runs)
-            
-            ⏱️ Plan triggered at: ${new Date().toISOString()}`;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            });
+          echo "✅ Speculative plan triggered for workspace: ${{ matrix.workspace }}"
+          echo "📋 View results at: https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }}/runs"
 
   apply-on-merge:
     needs: [detect-changes]
