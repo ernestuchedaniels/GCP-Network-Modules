@@ -1,0 +1,61 @@
+name: Test Terraform Pipeline
+
+on:
+  workflow_dispatch:  # Manual trigger
+  push:
+    branches: [test/**]
+    paths:
+      - 'dev-root/**'
+      - 'prod-root/**'
+
+env:
+  TF_CLOUD_ORGANIZATION: "Visa-replica"
+  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+
+jobs:
+  test-detect-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Test change detection
+        run: |
+          echo "Testing change detection logic..."
+          CHANGED_FILES="dev-root/01-project-setup/main.tf"
+          echo "Simulated changed files: $CHANGED_FILES"
+          
+          WORKSPACES=$(echo "$CHANGED_FILES" | grep -E '^(dev|prod)-root/' | cut -d'/' -f1-2 | sort -u | while read path; do
+            if [ -n "$path" ]; then
+              env=$(echo $path | cut -d'-' -f1)
+              stage=$(echo $path | cut -d'/' -f2)
+              echo "${env}-${stage}"
+            fi
+          done)
+          
+          echo "Detected workspaces: $WORKSPACES"
+
+  test-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.6"
+
+      - name: Test terraform commands
+        run: |
+          if [ -d "dev-root/01-project-setup" ]; then
+            cd dev-root/01-project-setup
+            echo "Testing terraform fmt..."
+            terraform fmt -check -recursive || echo "Format check would fail"
+            
+            echo "Testing terraform init..."
+            terraform init -backend=false
+            
+            echo "Testing terraform validate..."
+            terraform validate
+          fi

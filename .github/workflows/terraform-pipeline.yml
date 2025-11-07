@@ -1,6 +1,7 @@
 name: Terraform GitOps Pipeline
 
 on:
+  workflow_dispatch:  # Manual trigger for testing
   push:
     branches: [main]
     paths:

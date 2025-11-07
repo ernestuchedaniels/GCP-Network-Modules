@@ -65,11 +65,31 @@ GCP-Network-Modules/
 5. **Code Review** and approval process
 6. **Merge to main** triggers apply runs
 
+### Automated PR Comments
+
+GitHub Actions automatically posts detailed comments on PRs:
+
+```
+🔍 Speculative Plan Triggered for `dev-02-networking-core`
+
+**Changes in this PR:**
+- feat: add new subnet for web tier
+- fix: update firewall rules for HTTPS
+- docs: update subnet documentation
+
+📋 **View Results:**
+- [Terraform Cloud Workspace](https://app.terraform.io/app/Visa-replica/workspaces/dev-02-networking-core)
+- [Plan Details](https://app.terraform.io/app/Visa-replica/workspaces/dev-02-networking-core/runs)
+
+⏱️ Plan triggered at: 2025-01-XX...
+```
+
 ### Workflow Triggers
 
-- **PR Creation/Update**: Validation + Speculative Plans
+- **PR Creation/Update**: Validation + Speculative Plans + Automated Comments
 - **Merge to Main**: Apply runs for changed workspaces
 - **Path-based Triggering**: Only affected workspaces run
+- **Commit Message Integration**: PR comments include change descriptions
 
 ### GitHub Actions Pipeline
 
