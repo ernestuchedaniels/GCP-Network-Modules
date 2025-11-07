@@ -41,11 +41,12 @@ locals {
 resource "tfe_workspace" "network_workspaces" {
   for_each = local.workspaces
   
-  name         = each.key
-  organization = var.tfe_organization
+  name              = each.key
+  organization      = var.tfe_organization
   
   working_directory = "${each.value.environment}-root/${each.value.stage}"
   terraform_version = "1.13.5"
+  file_triggers_enabled = true
   
   vcs_repo {
     identifier     = var.github_repo
