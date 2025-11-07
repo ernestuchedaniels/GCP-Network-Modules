@@ -61,26 +61,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Trigger Speculative Plan
+        id: trigger-plan
         run: |
-          # Get workspace ID with error handling
-          echo "Getting workspace ID for: ${{ matrix.workspace }}"
-          WORKSPACE_RESPONSE=$(curl -s \
+          # Get workspace ID
+          WORKSPACE_ID=$(curl -s \
             --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
             --header "Content-Type: application/vnd.api+json" \
-            "https://app.terraform.io/api/v2/organizations/Visa-replica/workspaces/${{ matrix.workspace }}")
+            "https://app.terraform.io/api/v2/organizations/Visa-replica/workspaces/${{ matrix.workspace }}" | \
+            jq -r '.data.id')
           
-          echo "Workspace API response: $WORKSPACE_RESPONSE"
-          WORKSPACE_ID=$(echo "$WORKSPACE_RESPONSE" | jq -r '.data.id')
-          
-          if [ "$WORKSPACE_ID" = "null" ] || [ -z "$WORKSPACE_ID" ]; then
-            echo "Error: Could not get workspace ID"
-            exit 1
-          fi
-          
-          echo "Workspace ID: $WORKSPACE_ID"
-          
-          # Trigger speculative plan with error handling
-          PLAN_RESPONSE=$(curl -s -w "HTTP_STATUS:%{http_code}" \
+          # Trigger speculative plan
+          RUN_RESPONSE=$(curl -s \
             --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
             --header "Content-Type: application/vnd.api+json" \
             --request POST \
@@ -103,23 +94,70 @@ jobs:
             }" \
             https://app.terraform.io/api/v2/runs)
           
-          HTTP_STATUS=$(echo "$PLAN_RESPONSE" | grep -o 'HTTP_STATUS:[0-9]*' | cut -d: -f2)
-          RESPONSE_BODY=$(echo "$PLAN_RESPONSE" | sed 's/HTTP_STATUS:[0-9]*$//')
-          
-          echo "HTTP Status: $HTTP_STATUS"
-          echo "Response: $RESPONSE_BODY"
-          
-          if [ "$HTTP_STATUS" -ge 400 ]; then
-            echo "Error: TFE API call failed with status $HTTP_STATUS"
-            exit 1
-          fi
-          
-          echo "Speculative plan triggered successfully"
+          RUN_ID=$(echo "$RUN_RESPONSE" | jq -r '.data.id')
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "workspace_id=$WORKSPACE_ID" >> $GITHUB_OUTPUT
+          echo "Triggered run: $RUN_ID"
 
-      - name: Output Plan Details
+      - name: Wait for Plan and Get Results
         run: |
-          echo "✅ Speculative plan triggered for workspace: ${{ matrix.workspace }}"
-          echo "📋 View results at: https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }}/runs"
+          RUN_ID="${{ steps.trigger-plan.outputs.run_id }}"
+          
+          # Wait for plan to complete (max 5 minutes)
+          for i in {1..30}; do
+            RUN_STATUS=$(curl -s \
+              --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+              --header "Content-Type: application/vnd.api+json" \
+              "https://app.terraform.io/api/v2/runs/$RUN_ID" | \
+              jq -r '.data.attributes.status')
+            
+            echo "Run status: $RUN_STATUS"
+            
+            if [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "errored" || "$RUN_STATUS" == "canceled" ]]; then
+              break
+            fi
+            
+            sleep 10
+          done
+          
+          # Get plan details
+          PLAN_ID=$(curl -s \
+            --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+            --header "Content-Type: application/vnd.api+json" \
+            "https://app.terraform.io/api/v2/runs/$RUN_ID" | \
+            jq -r '.data.relationships.plan.data.id')
+          
+          if [ "$PLAN_ID" != "null" ]; then
+            PLAN_DETAILS=$(curl -s \
+              --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+              --header "Content-Type: application/vnd.api+json" \
+              "https://app.terraform.io/api/v2/plans/$PLAN_ID")
+            
+            RESOURCE_ADDITIONS=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."resource-additions"')
+            RESOURCE_CHANGES=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."resource-changes"')
+            RESOURCE_DESTRUCTIONS=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."resource-destructions"')
+            
+            echo "📋 **Plan Summary for \`${{ matrix.workspace }}\`**" >> plan_summary.md
+            echo "" >> plan_summary.md
+            echo "- **Resources to add:** $RESOURCE_ADDITIONS" >> plan_summary.md
+            echo "- **Resources to change:** $RESOURCE_CHANGES" >> plan_summary.md
+            echo "- **Resources to destroy:** $RESOURCE_DESTRUCTIONS" >> plan_summary.md
+            echo "- **Status:** $RUN_STATUS" >> plan_summary.md
+            echo "" >> plan_summary.md
+            echo "🔗 [View detailed plan in TFE](https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }}/runs)" >> plan_summary.md
+            
+            cat plan_summary.md
+          fi
+
+      - name: Display Plan Results
+        run: |
+          if [ -f "plan_summary.md" ]; then
+            echo "=== TERRAFORM PLAN SUMMARY ==="
+            cat plan_summary.md
+            echo "=============================="
+          else
+            echo "No plan summary available"
+          fi
 
   apply-on-merge:
     needs: [detect-changes]
