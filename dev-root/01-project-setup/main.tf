@@ -30,6 +30,7 @@ module "host_project" {
   labels = {
     environment = local.environment
     purpose     = "shared-vpc-host"
+    managed_by  = "terraform"
   }
 }
 
