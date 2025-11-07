@@ -18,18 +18,20 @@ locals {
   environment = "dev"
 }
 
-# Create Host Project
-module "host_project" {
-  source = "../../modules/gcp-host-project"
+# Use existing project and enable services
+resource "google_project_service" "apis" {
+  for_each = toset([
+    "compute.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "servicenetworking.googleapis.com",
+  ])
+  project            = var.host_project_id
+  service            = each.value
+  disable_on_destroy = false
+}
 
-  project_id      = var.host_project_id
-  project_name    = "${var.host_project_id}-${local.environment}"
-  billing_account = var.billing_account_id
-  org_id          = var.org_id
-
-  labels = {
-    environment = "dev"
-    purpose     = "sharedvpc"
-  }
+resource "google_compute_shared_vpc_host_project" "shared_vpc_host" {
+  project    = var.host_project_id
+  depends_on = [google_project_service.apis]
 }
 
