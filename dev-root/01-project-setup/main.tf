@@ -30,9 +30,6 @@ module "host_project" {
   labels = {
     environment = local.environment
     purpose     = "shared_vpc_host"
-    managed_by  = "terraform"
-    workflow    = "gitops_test"
-    version     = "v1_0"
   }
 }
 
