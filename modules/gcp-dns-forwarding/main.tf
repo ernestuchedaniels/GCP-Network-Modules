@@ -24,8 +24,7 @@ resource "google_dns_policy" "forwarding_policy" {
 }
 
 resource "google_dns_managed_zone" "forwarding_zone" {
-  count = length(var.forwarding_zones)
-  
+  count       = length(var.forwarding_zones)
   project     = var.project_id
   name        = var.forwarding_zones[count.index].name
   dns_name    = var.forwarding_zones[count.index].dns_name

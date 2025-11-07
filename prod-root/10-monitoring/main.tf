@@ -1,0 +1,62 @@
+terraform {
+  backend "remote" {
+    hostname     = "app.terraform.io"
+    organization = "your-tfe-organization"
+    workspaces {
+      name = "prod-10-monitoring"
+    }
+  }
+}
+
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.45"
+    }
+  }
+}
+
+locals {
+  environment = "prod"
+}
+
+# Read outputs from previous stages
+data "terraform_remote_state" "project_setup" {
+  backend = "remote"
+  config = {
+    workspace = "prod-07-monitoring"
+  }
+}
+
+data "terraform_remote_state" "networking_core" {
+  backend = "remote"
+  config = {
+    workspace = "prod-07-monitoring"
+  }
+}
+
+data "terraform_remote_state" "hybrid_connectivity" {
+  backend = "remote"
+  config = {
+    workspace = "prod-07-monitoring"
+  }
+}
+
+# Create monitoring dashboard
+module "network_dashboard" {
+  source = "../../modules/gcp-monitoring-dashboard"
+  
+  project_id  = data.terraform_remote_state.project_setup.outputs.host_project_id
+  environment = local.environment
+}
+
+# Create BGP monitoring alert
+module "bgp_alert" {
+  source = "../../modules/gcp-monitoring-alert"
+  
+  project_id           = data.terraform_remote_state.project_setup.outputs.host_project_id
+  router_name          = "${local.environment}-hybrid-router"
+  region               = var.region
+  notification_channel = var.notification_channel_id
+}

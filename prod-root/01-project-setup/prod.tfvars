@@ -1,3 +1,3 @@
-host_project_id  = "network-host-prod-001"
-billing_account  = "BILLING_ACCOUNT_ID"
-org_id          = "ORG_ID"
+host_project_id = "prod-network-host-project"
+billing_account = "012345-678901-234567"
+org_id         = "123456789012"

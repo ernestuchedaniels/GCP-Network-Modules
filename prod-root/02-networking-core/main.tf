@@ -1,4 +1,11 @@
 terraform {
+  backend "remote" {
+    hostname     = "app.terraform.io"
+    organization = "your-tfe-organization"
+    workspaces {
+      name = "prod-02-networking-core"
+    }
+  }
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -13,9 +20,9 @@ locals {
 
 # Read outputs from 01-project-setup
 data "terraform_remote_state" "project_setup" {
-  backend = "local"
+  backend = "remote"
   config = {
-    path = "../01-project-setup/terraform.tfstate"
+    workspace = "prod-01-project-setup"
   }
 }
 

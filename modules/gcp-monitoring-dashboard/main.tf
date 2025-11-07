@@ -1,5 +1,5 @@
 resource "google_monitoring_dashboard" "network_health" {
-  project        = var.project_id
+  project = var.project_id
   dashboard_json = jsonencode({
     displayName = "Network Health Dashboard - ${var.environment}"
     mosaicLayout = {

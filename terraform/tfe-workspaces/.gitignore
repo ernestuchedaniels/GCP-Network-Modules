@@ -1,0 +1,10 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+.terraform/
+.terraform.lock.hcl
+
+# Auto tfvars
+*.auto.tfvars
