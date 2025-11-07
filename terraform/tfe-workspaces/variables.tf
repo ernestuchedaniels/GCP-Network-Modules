@@ -38,8 +38,14 @@ variable "billing_account_id" {
   default     = null
 }
 
-variable "organization_id" {
+variable "org_id" {
   description = "GCP organization ID"
+  type        = string
+  default     = null
+}
+
+variable "host_project_id" {
+  description = "GCP host project ID"
   type        = string
   default     = null
 }

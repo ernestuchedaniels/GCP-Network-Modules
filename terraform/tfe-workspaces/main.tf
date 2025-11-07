@@ -45,7 +45,7 @@ resource "tfe_workspace" "network_workspaces" {
   organization = var.tfe_organization
   
   working_directory = "${each.value.environment}-root/${each.value.stage}"
-  terraform_version = "1.6.6"
+  terraform_version = "1.13.5"
   
   vcs_repo {
     identifier     = var.github_repo
@@ -95,3 +95,41 @@ resource "tfe_workspace_variable_set" "prod_workspace_vars" {
   workspace_id    = tfe_workspace.network_workspaces[each.key].id
   variable_set_id = tfe_variable_set.prod_variables.id
 }
+
+# Variables for dev environment
+resource "tfe_variable" "dev_gcp_credentials" {
+  key             = "GOOGLE_CREDENTIALS"
+  value           = var.gcp_credentials
+  category        = "env"
+  sensitive       = true
+  variable_set_id = tfe_variable_set.dev_variables.id
+}
+
+resource "tfe_variable" "dev_billing_account" {
+  count           = var.billing_account_id != null ? 1 : 0
+  key             = "TF_VAR_billing_account_id"
+  value           = var.billing_account_id
+  category        = "env"
+  variable_set_id = tfe_variable_set.dev_variables.id
+}
+
+# host_project_id and org_id variables already exist in TFE variable sets
+
+# Variables for prod environment
+resource "tfe_variable" "prod_gcp_credentials" {
+  key             = "GOOGLE_CREDENTIALS"
+  value           = var.gcp_credentials
+  category        = "env"
+  sensitive       = true
+  variable_set_id = tfe_variable_set.prod_variables.id
+}
+
+resource "tfe_variable" "prod_billing_account" {
+  count           = var.billing_account_id != null ? 1 : 0
+  key             = "TF_VAR_billing_account_id"
+  value           = var.billing_account_id
+  category        = "env"
+  variable_set_id = tfe_variable_set.prod_variables.id
+}
+
+# host_project_id and org_id variables already exist in TFE variable sets
