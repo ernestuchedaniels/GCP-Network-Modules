@@ -30,8 +30,9 @@ resource "google_project_service" "apis" {
   disable_on_destroy = false
 }
 
-resource "google_compute_shared_vpc_host_project" "shared_vpc_host" {
-  project    = var.host_project_id
-  depends_on = [google_project_service.apis]
-}
+# Shared VPC requires organization - commented out for testing
+# resource "google_compute_shared_vpc_host_project" "shared_vpc_host" {
+#   project    = var.host_project_id
+#   depends_on = [google_project_service.apis]
+# }
 

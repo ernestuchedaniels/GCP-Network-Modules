@@ -3,7 +3,8 @@ output "host_project_id" {
   value       = var.host_project_id
 }
 
-output "shared_vpc_host_project" {
-  description = "The shared VPC host project resource"
-  value       = google_compute_shared_vpc_host_project.shared_vpc_host.project
-}
+# Shared VPC output - commented out for testing
+# output "shared_vpc_host_project" {
+#   description = "The shared VPC host project resource"
+#   value       = google_compute_shared_vpc_host_project.shared_vpc_host.project
+# }

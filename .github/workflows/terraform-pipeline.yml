@@ -105,12 +105,12 @@ jobs:
           
           # Wait for plan to complete (max 5 minutes)
           for i in {1..30}; do
-            RUN_STATUS=$(curl -s \
+            RUN_RESPONSE=$(curl -s \
               --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
               --header "Content-Type: application/vnd.api+json" \
-              "https://app.terraform.io/api/v2/runs/$RUN_ID" | \
-              jq -r '.data.attributes.status')
+              "https://app.terraform.io/api/v2/runs/$RUN_ID")
             
+            RUN_STATUS=$(echo "$RUN_RESPONSE" | jq -r '.data.attributes.status')
             echo "Run status: $RUN_STATUS"
             
             if [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "errored" || "$RUN_STATUS" == "canceled" ]]; then
@@ -120,14 +120,15 @@ jobs:
             sleep 10
           done
           
-          # Get plan details
-          PLAN_ID=$(curl -s \
-            --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
-            --header "Content-Type: application/vnd.api+json" \
-            "https://app.terraform.io/api/v2/runs/$RUN_ID" | \
-            jq -r '.data.relationships.plan.data.id')
+          # Always create plan summary with status
+          echo "📋 **Plan Summary for \`${{ matrix.workspace }}\`**" >> plan_summary.md
+          echo "" >> plan_summary.md
+          echo "- **Status:** $RUN_STATUS" >> plan_summary.md
           
-          if [ "$PLAN_ID" != "null" ]; then
+          # Get plan details if available
+          PLAN_ID=$(echo "$RUN_RESPONSE" | jq -r '.data.relationships.plan.data.id // "null"')
+          
+          if [ "$PLAN_ID" != "null" ] && [ "$RUN_STATUS" == "planned" ]; then
             PLAN_DETAILS=$(curl -s \
               --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
               --header "Content-Type: application/vnd.api+json" \
@@ -137,17 +138,17 @@ jobs:
             RESOURCE_CHANGES=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."resource-changes"')
             RESOURCE_DESTRUCTIONS=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."resource-destructions"')
             
-            echo "📋 **Plan Summary for \`${{ matrix.workspace }}\`**" >> plan_summary.md
-            echo "" >> plan_summary.md
             echo "- **Resources to add:** $RESOURCE_ADDITIONS" >> plan_summary.md
             echo "- **Resources to change:** $RESOURCE_CHANGES" >> plan_summary.md
             echo "- **Resources to destroy:** $RESOURCE_DESTRUCTIONS" >> plan_summary.md
-            echo "- **Status:** $RUN_STATUS" >> plan_summary.md
-            echo "" >> plan_summary.md
-            echo "🔗 [View detailed plan in TFE](https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }}/runs)" >> plan_summary.md
-            
-            cat plan_summary.md
+          else
+            echo "- **Resources to add:** null" >> plan_summary.md
+            echo "- **Resources to change:** null" >> plan_summary.md
+            echo "- **Resources to destroy:** null" >> plan_summary.md
           fi
+          
+          echo "" >> plan_summary.md
+          echo "🔗 [View detailed plan in TFE](https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }}/runs)" >> plan_summary.md
 
       - name: Display Plan Results
         run: |
