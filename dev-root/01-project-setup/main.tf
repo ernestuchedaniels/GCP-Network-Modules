@@ -29,10 +29,10 @@ module "host_project" {
 
   labels = {
     environment = local.environment
-    purpose     = "shared-vpc-host"
+    purpose     = "shared_vpc_host"
     managed_by  = "terraform"
-    workflow    = "gitops-test"
-    version     = "v1.0"
+    workflow    = "gitops_test"
+    version     = "v1_0"
   }
 }
 
