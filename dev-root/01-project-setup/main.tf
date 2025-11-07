@@ -31,6 +31,7 @@ module "host_project" {
     environment = local.environment
     purpose     = "shared-vpc-host"
     managed_by  = "terraform"
+    workflow    = "gitops-test"
   }
 }
 
