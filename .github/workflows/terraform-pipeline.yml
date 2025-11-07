@@ -1,0 +1,204 @@
+name: Terraform GitOps Pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dev-root/**'
+      - 'prod-root/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dev-root/**'
+      - 'prod-root/**'
+
+env:
+  TF_CLOUD_ORGANIZATION: "Visa-replica"
+  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed-workspaces: ${{ steps.changes.outputs.workspaces }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed workspaces
+        id: changes
+        run: |
+          # Get changed files
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
+          else
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+          
+          # Extract workspace names from changed paths
+          WORKSPACES=$(echo "$CHANGED_FILES" | grep -E '^(dev|prod)-root/' | cut -d'/' -f1-2 | sort -u | while read path; do
+            if [ -n "$path" ]; then
+              env=$(echo $path | cut -d'-' -f1)
+              stage=$(echo $path | cut -d'/' -f2)
+              echo "${env}-${stage}"
+            fi
+          done | jq -R -s -c 'split("\n")[:-1]')
+          
+          echo "workspaces=$WORKSPACES" >> $GITHUB_OUTPUT
+          echo "Changed workspaces: $WORKSPACES"
+
+  validate:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.changed-workspaces != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace: ${{ fromJson(needs.detect-changes.outputs.changed-workspaces) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.6"
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format Check
+        run: |
+          WORKSPACE_PATH="${{ matrix.workspace }}"
+          ENV=$(echo $WORKSPACE_PATH | cut -d'-' -f1)
+          STAGE=$(echo $WORKSPACE_PATH | cut -d'-' -f2-)
+          FULL_PATH="${ENV}-root/${STAGE}"
+          
+          if [ -d "$FULL_PATH" ]; then
+            cd "$FULL_PATH"
+            terraform fmt -check -recursive
+          fi
+
+      - name: Terraform Init and Validate
+        run: |
+          WORKSPACE_PATH="${{ matrix.workspace }}"
+          ENV=$(echo $WORKSPACE_PATH | cut -d'-' -f1)
+          STAGE=$(echo $WORKSPACE_PATH | cut -d'-' -f2-)
+          FULL_PATH="${ENV}-root/${STAGE}"
+          
+          if [ -d "$FULL_PATH" ]; then
+            cd "$FULL_PATH"
+            terraform init -backend=false
+            terraform validate
+          fi
+
+  speculative-plan:
+    needs: [detect-changes, validate]
+    if: github.event_name == 'pull_request' && needs.detect-changes.outputs.changed-workspaces != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace: ${{ fromJson(needs.detect-changes.outputs.changed-workspaces) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trigger Speculative Plan
+        run: |
+          # Get workspace ID
+          WORKSPACE_ID=$(curl -s \
+            --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+            --header "Content-Type: application/vnd.api+json" \
+            "https://app.terraform.io/api/v2/organizations/Visa-replica/workspaces/${{ matrix.workspace }}" | \
+            jq -r '.data.id')
+          
+          # Trigger speculative plan
+          curl \
+            --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+            --header "Content-Type: application/vnd.api+json" \
+            --request POST \
+            --data "{
+              \"data\": {
+                \"attributes\": {
+                  \"is-destroy\": false,
+                  \"message\": \"Speculative plan for PR #${{ github.event.number }}\"
+                },
+                \"type\": \"runs\",
+                \"relationships\": {
+                  \"workspace\": {
+                    \"data\": {
+                      \"type\": \"workspaces\",
+                      \"id\": \"$WORKSPACE_ID\"
+                    }
+                  }
+                }
+              }
+            }" \
+            https://app.terraform.io/api/v2/runs
+
+      - name: Get commit messages
+        id: commits
+        run: |
+          COMMITS=$(git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.sha }} --pretty=format:"- %s" | head -5)
+          echo "messages<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Comment PR with Plan Link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commitMessages = `${{ steps.commits.outputs.messages }}`;
+            const body = `🔍 **Speculative Plan Triggered for \`${{ matrix.workspace }}\`**
+            
+            **Changes in this PR:**
+            ${commitMessages}
+            
+            📋 **View Results:**
+            - [Terraform Cloud Workspace](https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }})
+            - [Plan Details](https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }}/runs)
+            
+            ⏱️ Plan triggered at: ${new Date().toISOString()}`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  apply-on-merge:
+    needs: [detect-changes]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.detect-changes.outputs.changed-workspaces != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace: ${{ fromJson(needs.detect-changes.outputs.changed-workspaces) }}
+    steps:
+      - name: Trigger Apply Run
+        run: |
+          # Get workspace ID
+          WORKSPACE_ID=$(curl -s \
+            --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+            --header "Content-Type: application/vnd.api+json" \
+            "https://app.terraform.io/api/v2/organizations/Visa-replica/workspaces/${{ matrix.workspace }}" | \
+            jq -r '.data.id')
+          
+          # Trigger apply run
+          curl \
+            --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+            --header "Content-Type: application/vnd.api+json" \
+            --request POST \
+            --data "{
+              \"data\": {
+                \"attributes\": {
+                  \"is-destroy\": false,
+                  \"message\": \"Apply run triggered by merge to main - ${{ github.sha }}\"
+                },
+                \"type\": \"runs\",
+                \"relationships\": {
+                  \"workspace\": {
+                    \"data\": {
+                      \"type\": \"workspaces\",
+                      \"id\": \"$WORKSPACE_ID\"
+                    }
+                  }
+                }
+              }
+            }" \
+            https://app.terraform.io/api/v2/runs

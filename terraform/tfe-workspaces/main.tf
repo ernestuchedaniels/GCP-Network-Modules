@@ -45,6 +45,7 @@ resource "tfe_workspace" "network_workspaces" {
   organization = var.tfe_organization
   
   working_directory = "${each.value.environment}-root/${each.value.stage}"
+  terraform_version = "1.6.6"
   
   vcs_repo {
     identifier     = var.github_repo
