@@ -28,11 +28,8 @@ module "host_project" {
   org_id          = var.org_id
 
   labels = {
-    environment = local.environment
-    purpose     = "shared-vpc-host"
-    managed_by  = "terraform"
-    workflow    = "gitops-test"
-    version     = "v1.0"
+    environment = "dev"
+    purpose     = "sharedvpc"
   }
 }
 

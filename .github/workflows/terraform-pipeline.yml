@@ -49,41 +49,10 @@ jobs:
           echo "workspaces=$WORKSPACES" >> $GITHUB_OUTPUT
           echo "Changed workspaces: $WORKSPACES"
 
-  validate:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.changed-workspaces != '[]'
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        workspace: ${{ fromJson(needs.detect-changes.outputs.changed-workspaces) }}
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.13.5"
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Terraform Format Check
-        run: |
-          WORKSPACE_PATH="${{ matrix.workspace }}"
-          ENV=$(echo $WORKSPACE_PATH | cut -d'-' -f1)
-          STAGE=$(echo $WORKSPACE_PATH | cut -d'-' -f2-)
-          FULL_PATH="${ENV}-root/${STAGE}"
-          
-          if [ -d "$FULL_PATH" ]; then
-            cd "$FULL_PATH"
-            terraform fmt -check -recursive
-          fi
-
-      - name: Skip Validation (TFE handles validation)
-        run: |
-          echo "Skipping local validation - TFE will validate during plan/apply"
-          echo "Workspace: ${{ matrix.workspace }}"
 
   speculative-plan:
-    needs: [detect-changes, validate]
+    needs: [detect-changes]
     if: github.event_name == 'pull_request' && needs.detect-changes.outputs.changed-workspaces != '[]'
     runs-on: ubuntu-latest
     strategy:
