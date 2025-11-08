@@ -1,6 +1,6 @@
 subnets = {
   primary = {
-    name                     = "prod-primary-subnet"
+    app_name                 = "web"
     cidr_block              = "10.30.0.0/24"
     region                  = "us-central1"
     private_ip_google_access = true
