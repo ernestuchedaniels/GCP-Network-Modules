@@ -8,8 +8,8 @@ variable "vpc_link" {
   type        = string
 }
 
-variable "subnet_name" {
-  description = "Name of the subnet"
+variable "app_name" {
+  description = "Application name for subnet naming"
   type        = string
 }
 
@@ -43,3 +43,4 @@ variable "secondary_ranges" {
   }))
   default = []
 }
+

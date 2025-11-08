@@ -1,7 +1,7 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "your-tfe-organization"
+    organization = "Visa-replica"
     workspaces {
       name = "dev-03-networking-dmz"
     }
@@ -51,7 +51,7 @@ module "dmz_subnets" {
   for_each = var.dmz_subnets
   
   project_id               = module.dmz_host_project.project_id
-  subnet_name              = each.value.name
+  app_name                 = each.value.app_name
   cidr_block              = each.value.cidr_block
   region                  = each.value.region
   vpc_link                = module.dmz_vpc.vpc_self_link

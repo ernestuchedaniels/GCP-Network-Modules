@@ -1,7 +1,7 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "your-tfe-organization"
+    organization = "Visa-replica"
     workspaces {
       name = "prod-02-networking-core"
     }
@@ -22,7 +22,10 @@ locals {
 data "terraform_remote_state" "project_setup" {
   backend = "remote"
   config = {
-    workspace = "prod-01-project-setup"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "prod-01-project-setup"
+    }
   }
 }
 
@@ -44,7 +47,7 @@ module "subnets" {
   for_each = var.subnets
   
   project_id                = data.terraform_remote_state.project_setup.outputs.host_project_id
-  subnet_name               = each.value.name
+  app_name                  = each.value.app_name
   cidr_block                = each.value.cidr_block
   region                    = each.value.region
   vpc_link                  = module.main_vpc.vpc_self_link

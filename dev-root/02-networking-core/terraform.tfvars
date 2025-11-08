@@ -2,7 +2,7 @@
 # Second test to verify run ordering in TFE GUI
 subnets = {
   primary = {
-    name                     = "dev-primary-subnet"
+    app_name                 = "web"
     cidr_block              = "10.10.0.0/24"
     region                  = "us-central1"
     private_ip_google_access = true
@@ -19,7 +19,7 @@ subnets = {
     ]
   }
   secondary = {
-    name                     = "dev-secondary-subnet"
+    app_name                 = "api"
     cidr_block              = "10.10.1.0/24"
     region                  = "us-central1"
     private_ip_google_access = true

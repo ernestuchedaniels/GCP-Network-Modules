@@ -1,7 +1,7 @@
 variable "subnets" {
   description = "Map of subnets to create"
   type = map(object({
-    name                     = string
+    app_name                 = string
     cidr_block              = string
     region                  = string
     private_ip_google_access = bool

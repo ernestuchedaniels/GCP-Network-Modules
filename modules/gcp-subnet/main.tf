@@ -1,6 +1,10 @@
+resource "random_id" "subnet_suffix" {
+  byte_length = 2
+}
+
 resource "google_compute_subnetwork" "subnet" {
   project                  = var.project_id
-  name                     = var.subnet_name
+  name                     = "${var.app_name}-subnet-${random_id.subnet_suffix.hex}"
   ip_cidr_range            = var.cidr_block
   region                   = var.region
   network                  = var.vpc_link
