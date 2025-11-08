@@ -97,8 +97,8 @@ jobs:
           CONFIG_VERSION_ID=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.id')
           UPLOAD_URL=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.attributes."upload-url"')
           
-          # Create tar.gz of current workspace directory
-          tar -czf config.tar.gz -C ${{ matrix.workspace }} .
+          # Upload entire repository structure (best approach for modules)
+          tar -czf config.tar.gz --exclude='.git' --exclude='terraform/tfe-workspaces' --exclude='config.tar.gz' *
           
           # Upload configuration
           curl -X PUT "$UPLOAD_URL" --data-binary @config.tar.gz
@@ -152,7 +152,7 @@ jobs:
             RUN_STATUS=$(echo "$RUN_RESPONSE" | jq -r '.data.attributes.status')
             echo "Run status: $RUN_STATUS"
             
-            if [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "errored" || "$RUN_STATUS" == "canceled" ]]; then
+            if [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "planned_and_finished" || "$RUN_STATUS" == "errored" || "$RUN_STATUS" == "canceled" ]]; then
               break
             fi
             
@@ -167,7 +167,7 @@ jobs:
           echo "**Status:** $RUN_STATUS" >> plan_output.md
           echo "" >> plan_output.md
           
-          if [ "$PLAN_ID" != "null" ] && [ "$RUN_STATUS" == "planned" ]; then
+          if [ "$PLAN_ID" != "null" ] && [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "planned_and_finished" ]]; then
             # Get plan logs URL
             PLAN_DETAILS=$(curl -s \
               --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
@@ -177,11 +177,32 @@ jobs:
             PLAN_LOG_URL=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."log-read-url"')
             
             if [ "$PLAN_LOG_URL" != "null" ]; then
-              # Fetch the full plan output
+              # Fetch and parse plan output for clean display
               PLAN_OUTPUT=$(curl -s "$PLAN_LOG_URL")
               
-              echo "\`\`\`terraform" >> plan_output.md
-              echo "$PLAN_OUTPUT" >> plan_output.md
+              echo "\`\`\`" >> plan_output.md
+              
+              # Extract planned changes from JSON logs
+              echo "$PLAN_OUTPUT" | grep '"type":"planned_change"' | while read -r line; do
+                RESOURCE=$(echo "$line" | jq -r '.change.resource.addr')
+                ACTION=$(echo "$line" | jq -r '.change.action')
+                case $ACTION in
+                  "create") echo "  + $RESOURCE" >> plan_output.md ;;
+                  "update") echo "  ~ $RESOURCE" >> plan_output.md ;;
+                  "delete") echo "  - $RESOURCE" >> plan_output.md ;;
+                esac
+              done
+              
+              # Extract summary
+              SUMMARY=$(echo "$PLAN_OUTPUT" | grep '"type":"change_summary"' | tail -1)
+              if [ -n "$SUMMARY" ]; then
+                ADD=$(echo "$SUMMARY" | jq -r '.changes.add // 0')
+                CHANGE=$(echo "$SUMMARY" | jq -r '.changes.change // 0')
+                REMOVE=$(echo "$SUMMARY" | jq -r '.changes.remove // 0')
+                echo "" >> plan_output.md
+                echo "Plan: $ADD to add, $CHANGE to change, $REMOVE to destroy." >> plan_output.md
+              fi
+              
               echo "\`\`\`" >> plan_output.md
             else
               echo "Plan output not available" >> plan_output.md
@@ -211,6 +232,7 @@ jobs:
       matrix:
         workspace: ${{ fromJson(needs.detect-changes.outputs.changed-workspaces) }}
     steps:
+      - uses: actions/checkout@v4
       - name: Trigger Apply Run
         run: |
           # Get workspace ID
@@ -220,6 +242,38 @@ jobs:
             "https://app.terraform.io/api/v2/organizations/Visa-replica/workspaces/${{ matrix.workspace }}" | \
             jq -r '.data.id')
           
+          # Create configuration version for main branch
+          CONFIG_VERSION_RESPONSE=$(curl -s \
+            --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+            --header "Content-Type: application/vnd.api+json" \
+            --request POST \
+            --data "{
+              \"data\": {
+                \"type\": \"configuration-versions\",
+                \"attributes\": {
+                  \"auto-queue-runs\": false
+                },
+                \"relationships\": {
+                  \"workspace\": {
+                    \"data\": {
+                      \"type\": \"workspaces\",
+                      \"id\": \"$WORKSPACE_ID\"
+                    }
+                  }
+                }
+              }
+            }" \
+            "https://app.terraform.io/api/v2/workspaces/$WORKSPACE_ID/configuration-versions")
+          
+          CONFIG_VERSION_ID=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.id')
+          UPLOAD_URL=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.attributes."upload-url"')
+          
+          # Upload entire repository structure (best approach for modules)
+          tar -czf config.tar.gz --exclude='.git' --exclude='terraform/tfe-workspaces' --exclude='config.tar.gz' *
+          
+          # Upload configuration
+          curl -X PUT "$UPLOAD_URL" --data-binary @config.tar.gz
+          
           # Trigger apply run
           curl \
             --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
@@ -228,6 +282,27 @@ jobs:
             --data "{
               \"data\": {
                 \"attributes\": {
+                  \"is-destroy\": false,
+                  \"message\": \"Apply run triggered by merge to main - ${{ github.sha }}\"
+                },
+                \"type\": \"runs\",
+                \"relationships\": {
+                  \"workspace\": {
+                    \"data\": {
+                      \"type\": \"workspaces\",
+                      \"id\": \"$WORKSPACE_ID\"
+                    }
+                  },
+                  \"configuration-version\": {
+                    \"data\": {
+                      \"type\": \"configuration-versions\",
+                      \"id\": \"$CONFIG_VERSION_ID\"
+                    }
+                  }
+                }
+              }
+            }" \
+            https://app.terraform.io/api/v2/runs: {
                   \"is-destroy\": false,
                   \"message\": \"Apply run triggered by merge to main - ${{ github.sha }}\"
                 },

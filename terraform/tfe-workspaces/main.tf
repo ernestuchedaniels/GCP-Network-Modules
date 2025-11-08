@@ -46,13 +46,7 @@ resource "tfe_workspace" "network_workspaces" {
   
   working_directory = "${each.value.environment}-root/${each.value.stage}"
   terraform_version = "1.13.5"
-  auto_apply        = true
-  
-  vcs_repo {
-    identifier     = var.github_repo
-    branch         = "main"
-    oauth_token_id = var.oauth_token_id
-  }
+  auto_apply        = false
   
   tags = {
     environment = each.value.environment
@@ -60,7 +54,7 @@ resource "tfe_workspace" "network_workspaces" {
     type       = "network-infrastructure"
   }
   
-  description = "Workspace for ${each.value.environment} ${each.value.stage}"
+  description = "Workspace for ${each.value.environment} ${each.value.stage} - API-driven"
 }
 
 # Configure workspace settings
