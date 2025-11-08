@@ -2,7 +2,7 @@ terraform {
   required_providers {
     tfe = {
       source  = "hashicorp/tfe"
-      version = "~> 0.49"
+      version = "~> 0.70"
     }
   }
 }
@@ -46,7 +46,6 @@ resource "tfe_workspace" "network_workspaces" {
   
   working_directory = "${each.value.environment}-root/${each.value.stage}"
   terraform_version = "1.13.5"
-  execution_mode    = "remote"
   auto_apply        = true
   
   vcs_repo {
@@ -62,6 +61,14 @@ resource "tfe_workspace" "network_workspaces" {
   }
   
   description = "Workspace for ${each.value.environment} ${each.value.stage}"
+}
+
+# Configure workspace settings
+resource "tfe_workspace_settings" "network_workspace_settings" {
+  for_each = local.workspaces
+  
+  workspace_id   = tfe_workspace.network_workspaces[each.key].id
+  execution_mode = "remote"
 }
 
 # Create variable sets for environments
@@ -130,86 +137,4 @@ resource "tfe_variable" "prod_billing_account" {
   value           = var.billing_account_id
   category        = "env"
   variable_set_id = tfe_variable_set.prod_variables.id
-}
-
-# Configure remote state sharing based on stage dependencies
-
-# Stage 01 consumers: All other stages depend on project-setup
-resource "tfe_workspace_remote_state_consumers" "project_setup_consumers" {
-  for_each = {
-    for k, v in local.workspaces : k => v
-    if v.stage != "01-project-setup"
-  }
-  
-  workspace_id = tfe_workspace.network_workspaces["${each.value.environment}-01-project-setup"].id
-  consumer_ids = [tfe_workspace.network_workspaces[each.key].id]
-}
-
-# Stage 02 consumers: Stages 04, 05, 06, 08 depend on networking-core
-resource "tfe_workspace_remote_state_consumers" "networking_core_consumers" {
-  for_each = {
-    for k, v in local.workspaces : k => v
-    if contains(["04-network-peering", "05-dns-management", "06-firewall-rules", "08-service-projects"], v.stage)
-  }
-  
-  workspace_id = tfe_workspace.network_workspaces["${each.value.environment}-02-networking-core"].id
-  consumer_ids = [tfe_workspace.network_workspaces[each.key].id]
-}
-
-# Stage 03 consumers: Stages 04, 06 depend on networking-dmz
-resource "tfe_workspace_remote_state_consumers" "networking_dmz_consumers" {
-  for_each = {
-    for k, v in local.workspaces : k => v
-    if contains(["04-network-peering", "06-firewall-rules"], v.stage)
-  }
-  
-  workspace_id = tfe_workspace.network_workspaces["${each.value.environment}-03-networking-dmz"].id
-  consumer_ids = [tfe_workspace.network_workspaces[each.key].id]
-}
-
-# Stage 04 consumers: Stage 07 depends on network-peering
-resource "tfe_workspace_remote_state_consumers" "network_peering_consumers" {
-  for_each = {
-    for k, v in local.workspaces : k => v
-    if v.stage == "07-hybrid-connectivity"
-  }
-  
-  workspace_id = tfe_workspace.network_workspaces["${each.value.environment}-04-network-peering"].id
-  consumer_ids = [tfe_workspace.network_workspaces[each.key].id]
-}
-
-# Stage 08 consumers: Stage 09 depends on service-projects
-resource "tfe_workspace_remote_state_consumers" "service_projects_consumers" {
-  for_each = {
-    for k, v in local.workspaces : k => v
-    if v.stage == "09-private-access"
-  }
-  
-  workspace_id = tfe_workspace.network_workspaces["${each.value.environment}-08-service-projects"].id
-  consumer_ids = [tfe_workspace.network_workspaces[each.key].id]
-}
-
-# Stage 02 additional consumers: Stage 09 also depends on networking-core for subnets
-resource "tfe_workspace_remote_state_consumers" "networking_core_additional_consumers" {
-  for_each = {
-    for k, v in local.workspaces : k => v
-    if v.stage == "09-private-access"
-  }
-  
-  workspace_id = tfe_workspace.network_workspaces["${each.value.environment}-02-networking-core"].id
-  consumer_ids = [tfe_workspace.network_workspaces[each.key].id]
-}
-
-# Stages 10 & 11 consumers: Monitoring and cost management depend on all previous stages
-resource "tfe_workspace_remote_state_consumers" "all_stages_consumers" {
-  for_each = {
-    for k, v in local.workspaces : k => v
-    if contains(["10-monitoring", "11-cost-management"], v.stage)
-  }
-  
-  workspace_id = tfe_workspace.network_workspaces[each.key].id
-  consumer_ids = [
-    for stage in ["01-project-setup", "02-networking-core", "03-networking-dmz", "04-network-peering", "05-dns-management", "06-firewall-rules", "07-hybrid-connectivity", "08-service-projects", "09-private-access"] :
-    tfe_workspace.network_workspaces["${each.value.environment}-${stage}"].id
-  ]
 }
