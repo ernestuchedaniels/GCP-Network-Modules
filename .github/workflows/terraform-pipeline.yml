@@ -97,13 +97,8 @@ jobs:
           CONFIG_VERSION_ID=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.id')
           UPLOAD_URL=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.attributes."upload-url"')
           
-          # Create tar.gz with proper directory structure
-          # Convert workspace name to directory path (dev-02-networking-core -> dev-root/02-networking-core)
-          ENV=$(echo "${{ matrix.workspace }}" | cut -d'-' -f1)
-          STAGE=$(echo "${{ matrix.workspace }}" | cut -d'-' -f2-)
-          WORKSPACE_DIR="${ENV}-root/${STAGE}"
-          
-          tar -czf config.tar.gz "$WORKSPACE_DIR"
+          # Upload entire repository structure (best approach for modules)
+          tar -czf config.tar.gz --exclude='.git' --exclude='terraform/tfe-workspaces' .
           
           # Upload configuration
           curl -X PUT "$UPLOAD_URL" --data-binary @config.tar.gz
@@ -252,12 +247,8 @@ jobs:
           CONFIG_VERSION_ID=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.id')
           UPLOAD_URL=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.attributes."upload-url"')
           
-          # Create tar.gz with proper directory structure
-          ENV=$(echo "${{ matrix.workspace }}" | cut -d'-' -f1)
-          STAGE=$(echo "${{ matrix.workspace }}" | cut -d'-' -f2-)
-          WORKSPACE_DIR="${ENV}-root/${STAGE}"
-          
-          tar -czf config.tar.gz "$WORKSPACE_DIR"
+          # Upload entire repository structure (best approach for modules)
+          tar -czf config.tar.gz --exclude='.git' --exclude='terraform/tfe-workspaces' .
           
           # Upload configuration
           curl -X PUT "$UPLOAD_URL" --data-binary @config.tar.gz

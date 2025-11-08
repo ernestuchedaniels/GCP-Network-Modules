@@ -44,6 +44,7 @@ resource "tfe_workspace" "network_workspaces" {
   name              = each.key
   organization      = var.tfe_organization
   
+  working_directory = "${each.value.environment}-root/${each.value.stage}"
   terraform_version = "1.13.5"
   auto_apply        = false
   
