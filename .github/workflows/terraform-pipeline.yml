@@ -120,44 +120,48 @@ jobs:
             sleep 10
           done
           
-          # Always create plan summary with status
-          echo "📋 **Plan Summary for \`${{ matrix.workspace }}\`**" >> plan_summary.md
-          echo "" >> plan_summary.md
-          echo "- **Status:** $RUN_STATUS" >> plan_summary.md
-          
-          # Get plan details if available
+          # Get plan details and full output
           PLAN_ID=$(echo "$RUN_RESPONSE" | jq -r '.data.relationships.plan.data.id // "null"')
           
+          echo "## Terraform Plan for \`${{ matrix.workspace }}\`" >> plan_output.md
+          echo "" >> plan_output.md
+          echo "**Status:** $RUN_STATUS" >> plan_output.md
+          echo "" >> plan_output.md
+          
           if [ "$PLAN_ID" != "null" ] && [ "$RUN_STATUS" == "planned" ]; then
+            # Get plan logs URL
             PLAN_DETAILS=$(curl -s \
               --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
               --header "Content-Type: application/vnd.api+json" \
               "https://app.terraform.io/api/v2/plans/$PLAN_ID")
             
-            RESOURCE_ADDITIONS=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."resource-additions"')
-            RESOURCE_CHANGES=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."resource-changes"')
-            RESOURCE_DESTRUCTIONS=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."resource-destructions"')
+            PLAN_LOG_URL=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."log-read-url"')
             
-            echo "- **Resources to add:** $RESOURCE_ADDITIONS" >> plan_summary.md
-            echo "- **Resources to change:** $RESOURCE_CHANGES" >> plan_summary.md
-            echo "- **Resources to destroy:** $RESOURCE_DESTRUCTIONS" >> plan_summary.md
+            if [ "$PLAN_LOG_URL" != "null" ]; then
+              # Fetch the full plan output
+              PLAN_OUTPUT=$(curl -s "$PLAN_LOG_URL")
+              
+              echo "\`\`\`terraform" >> plan_output.md
+              echo "$PLAN_OUTPUT" >> plan_output.md
+              echo "\`\`\`" >> plan_output.md
+            else
+              echo "Plan output not available" >> plan_output.md
+            fi
           else
-            echo "- **Resources to add:** null" >> plan_summary.md
-            echo "- **Resources to change:** null" >> plan_summary.md
-            echo "- **Resources to destroy:** null" >> plan_summary.md
+            echo "No plan available (status: $RUN_STATUS)" >> plan_output.md
           fi
           
-          echo "" >> plan_summary.md
-          echo "🔗 [View detailed plan in TFE](https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }}/runs)" >> plan_summary.md
+          echo "" >> plan_output.md
+          echo "🔗 [View in TFE](https://app.terraform.io/app/Visa-replica/workspaces/${{ matrix.workspace }}/runs)" >> plan_output.md
 
       - name: Display Plan Results
         run: |
-          if [ -f "plan_summary.md" ]; then
-            echo "=== TERRAFORM PLAN SUMMARY ==="
-            cat plan_summary.md
-            echo "=============================="
+          if [ -f "plan_output.md" ]; then
+            echo "=== TERRAFORM PLAN OUTPUT ==="
+            cat plan_output.md
+            echo "============================="
           else
-            echo "No plan summary available"
+            echo "No plan output available"
           fi
 
   apply-on-merge:
