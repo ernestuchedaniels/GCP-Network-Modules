@@ -98,7 +98,7 @@ jobs:
           UPLOAD_URL=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.attributes."upload-url"')
           
           # Upload entire repository structure (best approach for modules)
-          tar -czf config.tar.gz --exclude='.git' --exclude='terraform/tfe-workspaces' .
+          tar -czf config.tar.gz --exclude='.git' --exclude='terraform/tfe-workspaces' --exclude='config.tar.gz' *
           
           # Upload configuration
           curl -X PUT "$UPLOAD_URL" --data-binary @config.tar.gz
@@ -248,7 +248,7 @@ jobs:
           UPLOAD_URL=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.attributes."upload-url"')
           
           # Upload entire repository structure (best approach for modules)
-          tar -czf config.tar.gz --exclude='.git' --exclude='terraform/tfe-workspaces' .
+          tar -czf config.tar.gz --exclude='.git' --exclude='terraform/tfe-workspaces' --exclude='config.tar.gz' *
           
           # Upload configuration
           curl -X PUT "$UPLOAD_URL" --data-binary @config.tar.gz
