@@ -1,3 +1,4 @@
+# Test change for dev-02-networking-core workspace
 subnets = {
   primary = {
     name                     = "dev-primary-subnet"
