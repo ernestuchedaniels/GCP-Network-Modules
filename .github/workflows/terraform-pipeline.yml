@@ -70,18 +70,18 @@ jobs:
             "https://app.terraform.io/api/v2/organizations/Visa-replica/workspaces/${{ matrix.workspace }}" | \
             jq -r '.data.id')
           
-          # Trigger speculative plan
-          RUN_RESPONSE=$(curl -s \
+          # Create configuration version from current branch
+          CONFIG_VERSION_RESPONSE=$(curl -s \
             --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
             --header "Content-Type: application/vnd.api+json" \
             --request POST \
             --data "{
               \"data\": {
+                \"type\": \"configuration-versions\",
                 \"attributes\": {
-                  \"is-destroy\": false,
-                  \"message\": \"Speculative plan for PR #${{ github.event.number }}\"
+                  \"auto-queue-runs\": false,
+                  \"speculative\": true
                 },
-                \"type\": \"runs\",
                 \"relationships\": {
                   \"workspace\": {
                     \"data\": {
@@ -92,12 +92,51 @@ jobs:
                 }
               }
             }" \
+            "https://app.terraform.io/api/v2/workspaces/$WORKSPACE_ID/configuration-versions")
+          
+          CONFIG_VERSION_ID=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.id')
+          UPLOAD_URL=$(echo "$CONFIG_VERSION_RESPONSE" | jq -r '.data.attributes."upload-url"')
+          
+          # Create tar.gz of current workspace directory
+          tar -czf config.tar.gz -C ${{ matrix.workspace }} .
+          
+          # Upload configuration
+          curl -X PUT "$UPLOAD_URL" --data-binary @config.tar.gz
+          
+          # Trigger speculative plan with feature branch config
+          RUN_RESPONSE=$(curl -s \
+            --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+            --header "Content-Type: application/vnd.api+json" \
+            --request POST \
+            --data "{
+              \"data\": {
+                \"attributes\": {
+                  \"is-destroy\": false,
+                  \"message\": \"Speculative plan for PR #${{ github.event.number }} from ${{ github.head_ref }}\"
+                },
+                \"type\": \"runs\",
+                \"relationships\": {
+                  \"workspace\": {
+                    \"data\": {
+                      \"type\": \"workspaces\",
+                      \"id\": \"$WORKSPACE_ID\"
+                    }
+                  },
+                  \"configuration-version\": {
+                    \"data\": {
+                      \"type\": \"configuration-versions\",
+                      \"id\": \"$CONFIG_VERSION_ID\"
+                    }
+                  }
+                }
+              }
+            }" \
             https://app.terraform.io/api/v2/runs)
           
           RUN_ID=$(echo "$RUN_RESPONSE" | jq -r '.data.id')
           echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
           echo "workspace_id=$WORKSPACE_ID" >> $GITHUB_OUTPUT
-          echo "Triggered run: $RUN_ID"
+          echo "Triggered run: $RUN_ID with feature branch config"
 
       - name: Wait for Plan and Get Results
         run: |
