@@ -1,3 +1,11 @@
+locals {
+  valid_regions = [
+    "us-central1", "us-east1", "us-east4", "us-west1", "us-west2", "us-west3", "us-west4",
+    "europe-west1", "europe-west2", "europe-west3", "europe-west4", "europe-west6",
+    "asia-east1", "asia-northeast1", "asia-southeast1", "australia-southeast1"
+  ]
+}
+
 resource "random_id" "subnet_suffix" {
   byte_length = 2
 }
@@ -25,6 +33,10 @@ resource "google_compute_subnetwork" "subnet" {
         can(regex("^192\\.168\\.", split("/", var.cidr_block)[0]))
       )
       error_message = "CIDR ${var.cidr_block} is not a private IP range (RFC 1918)"
+    }
+    precondition {
+      condition = contains(local.valid_regions, var.region)
+      error_message = "Invalid region '${var.region}'. Valid regions: ${join(", ", local.valid_regions)}"
     }
     precondition {
       condition = can(regex("^[a-z]([a-z0-9-]*[a-z0-9])?$", var.app_name)) && length(var.app_name) <= 50
