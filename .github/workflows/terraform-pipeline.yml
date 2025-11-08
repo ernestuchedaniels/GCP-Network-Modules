@@ -177,11 +177,32 @@ jobs:
             PLAN_LOG_URL=$(echo "$PLAN_DETAILS" | jq -r '.data.attributes."log-read-url"')
             
             if [ "$PLAN_LOG_URL" != "null" ]; then
-              # Fetch the full plan output
+              # Fetch and parse plan output for clean display
               PLAN_OUTPUT=$(curl -s "$PLAN_LOG_URL")
               
-              echo "\`\`\`terraform" >> plan_output.md
-              echo "$PLAN_OUTPUT" >> plan_output.md
+              echo "\`\`\`" >> plan_output.md
+              
+              # Extract planned changes from JSON logs
+              echo "$PLAN_OUTPUT" | grep '"type":"planned_change"' | while read -r line; do
+                RESOURCE=$(echo "$line" | jq -r '.change.resource.addr')
+                ACTION=$(echo "$line" | jq -r '.change.action')
+                case $ACTION in
+                  "create") echo "  + $RESOURCE" >> plan_output.md ;;
+                  "update") echo "  ~ $RESOURCE" >> plan_output.md ;;
+                  "delete") echo "  - $RESOURCE" >> plan_output.md ;;
+                esac
+              done
+              
+              # Extract summary
+              SUMMARY=$(echo "$PLAN_OUTPUT" | grep '"type":"change_summary"' | tail -1)
+              if [ -n "$SUMMARY" ]; then
+                ADD=$(echo "$SUMMARY" | jq -r '.changes.add // 0')
+                CHANGE=$(echo "$SUMMARY" | jq -r '.changes.change // 0')
+                REMOVE=$(echo "$SUMMARY" | jq -r '.changes.remove // 0')
+                echo "" >> plan_output.md
+                echo "Plan: $ADD to add, $CHANGE to change, $REMOVE to destroy." >> plan_output.md
+              fi
+              
               echo "\`\`\`" >> plan_output.md
             else
               echo "Plan output not available" >> plan_output.md
