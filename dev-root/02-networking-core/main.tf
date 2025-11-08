@@ -1,7 +1,7 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "your-tfe-organization"
+    organization = "Visa-replica"
     workspaces {
       name = "dev-02-networking-core"
     }
@@ -17,6 +17,8 @@ terraform {
 locals {
   environment = "dev"
 }
+
+# Core networking infrastructure for dev environment
 
 # Read outputs from 01-project-setup
 data "terraform_remote_state" "project_setup" {
