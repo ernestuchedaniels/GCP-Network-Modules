@@ -56,6 +56,16 @@ resource "terraform_data" "app_name_validation" {
   }
 }
 
+# Naming Convention Validation (appname-subnet)
+resource "terraform_data" "naming_convention_validation" {
+  lifecycle {
+    precondition {
+      condition = can(regex("^[a-z0-9]+(-[a-z0-9]+)*-subnet$", var.subnet_name))
+      error_message = "Subnet name '${var.subnet_name}' does not follow naming convention. Expected format: appname-subnet (e.g., web-subnet, api-subnet, db-subnet)"
+    }
+  }
+}
+
 # Secondary Range CIDR Format Validation
 resource "terraform_data" "secondary_cidr_format_validation" {
   count = length(var.secondary_ranges) > 0 ? 1 : 0
@@ -91,4 +101,3 @@ resource "terraform_data" "secondary_private_ip_validation" {
       error_message = "Non-private IP ranges found in secondary ranges"
     }
   }
-}
