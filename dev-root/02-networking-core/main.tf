@@ -19,6 +19,7 @@ locals {
 }
 
 # Core networking infrastructure for dev environment
+# Testing GitOps workflow with feature branch speculative plans
 
 # Read outputs from 01-project-setup
 data "terraform_remote_state" "project_setup" {
