@@ -16,9 +16,7 @@ resource "google_compute_vpn_tunnel" "tunnels" {
   vpn_gateway           = google_compute_ha_vpn_gateway.vpn_gateway.id
   peer_gcp_gateway      = var.peer_vpn_gateway_id
   shared_secret         = var.shared_secrets[count.index]
-  router                = var.router_name
   vpn_gateway_interface = count.index
-  peer_gateway_interface = count.index
 }
 
 # Create Router Interface
