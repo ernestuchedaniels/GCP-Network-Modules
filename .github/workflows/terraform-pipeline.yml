@@ -224,6 +224,31 @@ jobs:
             echo "No plan output available"
           fi
 
+      - name: Check Plan Status
+        run: |
+          RUN_ID="${{ steps.trigger-plan.outputs.run_id }}"
+          
+          # Get final run status
+          RUN_RESPONSE=$(curl -s \
+            --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+            --header "Content-Type: application/vnd.api+json" \
+            "https://app.terraform.io/api/v2/runs/$RUN_ID")
+          
+          RUN_STATUS=$(echo "$RUN_RESPONSE" | jq -r '.data.attributes.status')
+          
+          echo "Final plan status: $RUN_STATUS"
+          
+          # Fail the job if plan failed
+          if [[ "$RUN_STATUS" == "errored" || "$RUN_STATUS" == "canceled" ]]; then
+            echo "❌ Plan failed for workspace ${{ matrix.workspace }}"
+            exit 1
+          elif [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "planned_and_finished" ]]; then
+            echo "✅ Plan succeeded for workspace ${{ matrix.workspace }}"
+          else
+            echo "⚠️ Unexpected plan status: $RUN_STATUS"
+            exit 1
+          fi
+
   apply-on-merge:
     needs: [detect-changes]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.detect-changes.outputs.changed-workspaces != '[]'
