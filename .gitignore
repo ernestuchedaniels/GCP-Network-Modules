@@ -7,8 +7,12 @@
 .terraform.lock.hcl
 
 # Environment variables
-*.tfvars
+*.auto.tfvars
+*.secret.tfvars
+!terraform.tfvars
 !terraform.tfvars.example
+# Exclude TFE workspace tfvars (contains secrets)
+terraform/tfe-workspaces/terraform.tfvars
 
 # IDE
 .vscode/
