@@ -101,14 +101,3 @@ resource "terraform_data" "secondary_private_ip_validation" {
       error_message = "Non-private IP ranges found in secondary ranges"
     }
   }
-}
-
-# Naming Convention Validation (appname-subnet)
-resource "terraform_data" "naming_convention_validation" {
-  lifecycle {
-    precondition {
-      condition = can(regex("^[a-z0-9]+(-[a-z0-9]+)*-subnet$", var.subnet_name))
-      error_message = "Subnet name '${var.subnet_name}' does not follow naming convention. Expected format: appname-subnet (e.g., web-subnet, api-subnet, db-subnet)"
-    }
-  }
-}
