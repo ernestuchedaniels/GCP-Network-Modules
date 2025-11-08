@@ -1,4 +1,5 @@
 # Test change for dev-02-networking-core workspace
+# Second test to verify run ordering in TFE GUI
 subnets = {
   primary = {
     name                     = "dev-primary-subnet"
