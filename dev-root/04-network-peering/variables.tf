@@ -1,11 +1,10 @@
-variable "import_custom_routes" {
-  description = "Whether to import custom routes from peer VPC"
-  type        = bool
-  default     = true
-}
-
-variable "export_custom_routes" {
-  description = "Whether to export custom routes to peer VPC"
-  type        = bool
-  default     = true
+variable "vpc_peering_connections" {
+  description = "Map of VPC peering connections to create"
+  type = map(object({
+    peering_name         = string
+    local_vpc_link       = string
+    peer_vpc_link        = string
+    import_custom_routes = bool
+    export_custom_routes = bool
+  }))
 }
