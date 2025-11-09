@@ -26,7 +26,7 @@ dns_forwarding_policies = {
     description              = "DNS hub policy for Core VPC"
     forwarding_zones = [
       {
-        name        = "onprem-forward"
+        name        = "core-onprem-forward"
         dns_name    = "onprem.visa.com."
         description = "Forward on-prem queries"
         target_name_servers = [
@@ -57,7 +57,7 @@ dns_forwarding_policies = {
         ]
       },
       {
-        name        = "onprem-forward"
+        name        = "dmz-onprem-forward"
         dns_name    = "onprem.visa.com."
         description = "Forward on-prem queries to Core VPC"
         target_name_servers = [
