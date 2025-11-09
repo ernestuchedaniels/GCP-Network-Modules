@@ -14,31 +14,56 @@ dns_zones = {
   }
 }
 
-# DNS Forwarding Policies configuration - DMZ VPC only
+# DNS Forwarding Policies configuration
 dns_forwarding_policies = {
+  # Core VPC - DNS Hub with on-prem forwarding
+  core_policy = {
+    project_id                = "visa-gcp-network"
+    policy_name              = "dev-core-dns-policy"
+    network_self_link        = "CORE_VPC"
+    enable_inbound_forwarding = true
+    enable_logging           = true
+    description              = "DNS hub policy for Core VPC"
+    forwarding_zones = [
+      {
+        name        = "onprem-forward"
+        dns_name    = "onprem.visa.com."
+        description = "Forward on-prem queries"
+        target_name_servers = [
+          {
+            ipv4_address = "10.0.1.10"  # On-prem DNS server
+          }
+        ]
+      }
+    ]
+  }
+  # DMZ VPC - DNS Spoke forwarding to Core VPC
   dmz_policy = {
     project_id                = "visa-gcp-network"
     policy_name              = "dev-dmz-dns-policy"
     network_self_link        = "DMZ_VPC"
-    enable_inbound_forwarding = true
+    enable_inbound_forwarding = false
     enable_logging           = true
-    description              = "DNS forwarding policy for DMZ VPC"
+    description              = "DNS spoke policy for DMZ VPC"
     forwarding_zones = [
       {
-        name        = "external-forward"
-        dns_name    = "external.visa.com."
-        description = "Forward external queries"
+        name        = "internal-forward"
+        dns_name    = "internal.visa.com."
+        description = "Forward internal queries to Core VPC"
         target_name_servers = [
           {
-            ipv4_address = "8.8.8.8"
+            ipv4_address = "10.10.0.2"  # Core VPC DNS resolver (primary subnet)
           }
-          # Multiple DNS servers example:
-          # {
-          #   ipv4_address = "8.8.4.4"
-          # },
-          # {
-          #   ipv4_address = "1.1.1.1"
-          # }
+        ]
+      },
+      {
+        name        = "onprem-forward"
+        dns_name    = "onprem.visa.com."
+        description = "Forward on-prem queries to Core VPC"
+        target_name_servers = [
+          {
+            ipv4_address = "10.10.0.2"  # Core VPC DNS resolver (primary subnet)
+          }
         ]
       }
     ]
