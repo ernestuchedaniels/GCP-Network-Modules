@@ -249,6 +249,16 @@ jobs:
             exit 1
           fi
 
+  speculative-plan-summary:
+    needs: [detect-changes, speculative-plan]
+    if: github.event_name == 'pull_request' && needs.detect-changes.outputs.changed-workspaces != '[]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "✅ All speculative plans completed successfully"
+          echo "Changed workspaces: ${{ needs.detect-changes.outputs.changed-workspaces }}"
+
   apply-on-merge:
     needs: [detect-changes]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.detect-changes.outputs.changed-workspaces != '[]'
