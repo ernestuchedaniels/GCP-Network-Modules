@@ -1,3 +1,4 @@
+# DMZ subnets in same project as core networking for testing
 dmz_subnets = {
   dmz_primary = {
     app_name                 = "proxy"
