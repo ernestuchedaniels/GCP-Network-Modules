@@ -1,8 +1,3 @@
-output "dmz_host_project_id" {
-  description = "The DMZ host project ID"
-  value       = module.dmz_host_project.project_id
-}
-
 output "dmz_vpc_self_link" {
   description = "The self link of the DMZ VPC"
   value       = module.dmz_vpc.vpc_self_link

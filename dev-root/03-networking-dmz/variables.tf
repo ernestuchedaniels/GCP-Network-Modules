@@ -1,18 +1,3 @@
-variable "dmz_project_id" {
-  description = "The DMZ host project ID"
-  type        = string
-}
-
-variable "billing_account" {
-  description = "The billing account ID"
-  type        = string
-}
-
-variable "org_id" {
-  description = "The organization ID"
-  type        = string
-}
-
 variable "dmz_subnets" {
   description = "Map of DMZ subnets to create"
   type = map(object({
