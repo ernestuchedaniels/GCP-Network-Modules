@@ -21,6 +21,12 @@ locals {
     data.terraform_remote_state.networking_core.outputs.main_vpc_self_link,
     data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link
   ]
+  
+  # VPC lookup map for flexible network selection
+  vpc_lookup = {
+    "CORE_VPC" = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
+    "DMZ_VPC"  = data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link
+  }
 }
 
 # Read outputs from previous stages
@@ -66,7 +72,9 @@ module "dns_zones" {
   description = each.value.description
   visibility  = each.value.visibility
   
-  private_visibility_config_networks = local.all_vpc_links
+  private_visibility_config_networks = [
+    for vpc in each.value.vpc_networks : local.vpc_lookup[vpc]
+  ]
   
   labels = each.value.labels
 }
@@ -79,7 +87,7 @@ module "dns_forwarding_policies" {
   
   project_id        = each.value.project_id
   policy_name       = each.value.policy_name
-  network_self_link = each.value.network_self_link == "CORE_VPC" ? data.terraform_remote_state.networking_core.outputs.main_vpc_self_link : data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link
+  network_self_link = local.vpc_lookup[each.value.network_self_link]
   
   enable_inbound_forwarding = each.value.enable_inbound_forwarding
   enable_logging           = each.value.enable_logging
