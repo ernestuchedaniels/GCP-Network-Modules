@@ -3,7 +3,7 @@ terraform {
     hostname     = "app.terraform.io"
     organization = "your-tfe-organization"
     workspaces {
-      name = "prod-08-service-projects"
+      name = "prod-09-service-projects"
     }
   }
   required_providers {

@@ -18,12 +18,13 @@ locals {
     "03-networking-dmz",
     "04-network-peering",
     "05-dns-management",
-    "06-firewall-rules",
-    "07-hybrid-connectivity",
-    "08-service-projects",
-    "09-private-access",
-    "10-monitoring",
-    "11-cost-management"
+    "06-dns-records",
+    "07-firewall-rules",
+    "08-hybrid-connectivity",
+    "09-service-projects",
+    "10-private-access",
+    "11-monitoring",
+    "12-cost-management"
   ]
   
   environments = ["dev", "prod"]
