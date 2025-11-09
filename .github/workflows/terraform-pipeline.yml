@@ -337,19 +337,4 @@ jobs:
                 }
               }
             }" \
-            https://app.terraform.io/api/v2/runs: {
-                  \"is-destroy\": false,
-                  \"message\": \"Apply run triggered by merge to main - ${{ github.sha }}\"
-                },
-                \"type\": \"runs\",
-                \"relationships\": {
-                  \"workspace\": {
-                    \"data\": {
-                      \"type\": \"workspaces\",
-                      \"id\": \"$WORKSPACE_ID\"
-                    }
-                  }
-                }
-              }
-            }" \
             https://app.terraform.io/api/v2/runs
