@@ -25,9 +25,9 @@ dns_forwarding_policies = {
     description              = "DNS forwarding policy for DMZ VPC"
     forwarding_zones = [
       {
-        name        = "internal-forward"
-        dns_name    = "internal.visa.com."
-        description = "Forward internal queries"
+        name        = "external-forward"
+        dns_name    = "external.visa.com."
+        description = "Forward external queries"
         target_name_servers = [
           {
             ipv4_address = "8.8.8.8"
