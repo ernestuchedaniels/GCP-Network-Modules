@@ -1,5 +1,5 @@
 # Test change for dev-02-networking-core workspace
-# Second test to verify run ordering in TFE GUI
+# Region validation test with clean CIDR blocks
 subnets = {
   primary = {
     app_name                 = "web"
