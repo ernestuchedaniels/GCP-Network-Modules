@@ -16,6 +16,11 @@ terraform {
 
 locals {
   environment = "prod"
+  # Automatically map DNS suffixes to zone IDs
+  zone_lookup = {
+    for zone_key, zone_data in data.terraform_remote_state.dns_management.outputs.dns_zones :
+    zone_data.dns_suffix => zone_data.zone_id
+  }
 }
 
 # Read outputs from DNS management stage
@@ -36,8 +41,8 @@ module "dns_records" {
   for_each = var.dns_records
   
   project_id   = each.value.project_id
-  zone_id      = data.terraform_remote_state.dns_management.outputs.dns_zones[each.value.zone_key].zone_id
-  record_name  = each.value.name
+  zone_id      = local.zone_lookup[each.value.dns_suffix]
+  record_name  = "${each.value.record_name}.${each.value.dns_suffix}"
   record_type  = each.value.type
   ttl          = each.value.ttl
   rrdatas      = each.value.rrdatas
