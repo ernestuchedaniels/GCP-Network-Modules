@@ -1,9 +1,20 @@
-output "private_dns_zone_id" {
-  description = "ID of the private DNS zone"
-  value       = module.private_dns_zone.zone_id
+output "dns_zones" {
+  description = "Map of created DNS zones"
+  value = {
+    for k, v in module.dns_zones : k => {
+      zone_id   = v.zone_id
+      zone_name = v.zone_name
+      name_servers = v.name_servers
+    }
+  }
 }
 
-output "dns_policy_id" {
-  description = "ID of the DNS forwarding policy"
-  value       = module.dns_forwarding.policy_id
+output "dns_forwarding_policies" {
+  description = "Map of created DNS forwarding policies"
+  value = {
+    for k, v in module.dns_forwarding_policies : k => {
+      policy_id = v.policy_id
+      policy_name = v.policy_name
+    }
+  }
 }

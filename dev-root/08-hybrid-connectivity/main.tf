@@ -3,7 +3,7 @@ terraform {
     hostname     = "app.terraform.io"
     organization = "your-tfe-organization"
     workspaces {
-      name = "prod-07-hybrid-connectivity"
+      name = "dev-08-hybrid-connectivity"
     }
   }
   required_providers {
@@ -15,28 +15,28 @@ terraform {
 }
 
 locals {
-  environment = "prod"
+  environment = "dev"
 }
 
 # Read outputs from previous stages
 data "terraform_remote_state" "project_setup" {
   backend = "remote"
   config = {
-    workspace = "prod-01-project-setup"
+    workspace = "dev-01-project-setup"
   }
 }
 
 data "terraform_remote_state" "networking_core" {
   backend = "remote"
   config = {
-    workspace = "prod-02-networking-core"
+    workspace = "dev-02-networking-core"
   }
 }
 
 data "terraform_remote_state" "networking_dmz" {
   backend = "remote"
   config = {
-    workspace = "prod-03-networking-dmz"
+    workspace = "dev-03-networking-dmz"
   }
 }
 

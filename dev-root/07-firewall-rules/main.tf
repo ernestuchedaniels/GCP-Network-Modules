@@ -3,12 +3,9 @@ terraform {
     hostname     = "app.terraform.io"
     organization = "your-tfe-organization"
     workspaces {
-      name = "prod-06-firewall-rules"
+      name = "dev-07-firewall-rules"
     }
   }
-}
-
-terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -18,21 +15,21 @@ terraform {
 }
 
 locals {
-  environment = "prod"
+  environment = "dev"
 }
 
 # Read outputs from previous stages
 data "terraform_remote_state" "project_setup" {
   backend = "remote"
   config = {
-    workspace = "prod-02-networking-core"
+    workspace = "dev-01-project-setup"
   }
 }
 
 data "terraform_remote_state" "networking_core" {
   backend = "remote"
   config = {
-    workspace = "prod-02-networking-core"
+    workspace = "dev-02-networking-core"
   }
 }
 

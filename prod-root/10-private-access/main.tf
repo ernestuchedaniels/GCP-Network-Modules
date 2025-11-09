@@ -3,7 +3,7 @@ terraform {
     hostname     = "app.terraform.io"
     organization = "your-tfe-organization"
     workspaces {
-      name = "prod-09-private-access"
+      name = "prod-10-private-access"
     }
   }
 }
