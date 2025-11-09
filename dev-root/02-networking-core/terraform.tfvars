@@ -34,4 +34,12 @@ subnets = {
     description             = "Database subnet for dev environment"
     secondary_ranges        = []
   }
+  cache = {
+    app_name                 = "cache"
+    cidr_block              = "10.10.3.0/24"
+    region                  = "australia-southeast1"
+    private_ip_google_access = true
+    description             = "Cache subnet for dev environment"
+    secondary_ranges        = []
+  }
 }
