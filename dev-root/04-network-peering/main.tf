@@ -16,6 +16,7 @@ terraform {
 
 locals {
   environment = "dev"
+  # Testing VPC peering with correct configuration
 }
 
 # Create VPC Peering Connections
