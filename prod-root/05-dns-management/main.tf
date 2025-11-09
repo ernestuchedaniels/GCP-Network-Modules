@@ -1,7 +1,7 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "your-tfe-organization"
+    organization = "Visa-replica"
     workspaces {
       name = "prod-05-dns-management"
     }
@@ -16,27 +16,41 @@ terraform {
 
 locals {
   environment = "prod"
+  # Automatically include all available VPCs for DNS visibility
+  all_vpc_links = [
+    data.terraform_remote_state.networking_core.outputs.main_vpc_self_link,
+    data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link
+  ]
 }
 
 # Read outputs from previous stages
 data "terraform_remote_state" "project_setup" {
   backend = "remote"
   config = {
-    workspace = "prod-01-project-setup"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "prod-01-project-setup"
+    }
   }
 }
 
 data "terraform_remote_state" "networking_core" {
   backend = "remote"
   config = {
-    workspace = "prod-02-networking-core"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "prod-02-networking-core"
+    }
   }
 }
 
 data "terraform_remote_state" "networking_dmz" {
   backend = "remote"
   config = {
-    workspace = "prod-03-networking-dmz"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "prod-03-networking-dmz"
+    }
   }
 }
 
@@ -52,28 +66,9 @@ module "dns_zones" {
   description = each.value.description
   visibility  = each.value.visibility
   
-  private_visibility_config_networks = [
-    for network in each.value.private_visibility_config_networks :
-    network == "CORE_VPC_LINK" ? data.terraform_remote_state.networking_core.outputs.main_vpc_self_link :
-    network == "DMZ_VPC_LINK" ? data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link :
-    network
-  ]
+  private_visibility_config_networks = local.all_vpc_links
   
   labels = each.value.labels
-}
-
-# Create DNS Records
-module "dns_records" {
-  source = "../../modules/gcp-dns-record"
-  
-  for_each = var.dns_records
-  
-  project_id   = each.value.project_id
-  zone_id      = module.dns_zones[each.value.zone_key].zone_id
-  record_name  = each.value.name
-  record_type  = each.value.type
-  ttl          = each.value.ttl
-  rrdatas      = each.value.rrdatas
 }
 
 # Create DNS Forwarding Policies
@@ -84,7 +79,7 @@ module "dns_forwarding_policies" {
   
   project_id        = each.value.project_id
   policy_name       = each.value.policy_name
-  network_self_link = each.value.network_self_link == "CORE_VPC_LINK" ? data.terraform_remote_state.networking_core.outputs.main_vpc_self_link : each.value.network_self_link == "DMZ_VPC_LINK" ? data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link : each.value.network_self_link
+  network_self_link = each.value.network_self_link == "CORE_VPC" ? data.terraform_remote_state.networking_core.outputs.main_vpc_self_link : data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link
   
   enable_inbound_forwarding = each.value.enable_inbound_forwarding
   enable_logging           = each.value.enable_logging
