@@ -32,6 +32,13 @@ dns_forwarding_policies = {
           {
             ipv4_address = "8.8.8.8"
           }
+          # Multiple DNS servers example:
+          # {
+          #   ipv4_address = "8.8.4.4"
+          # },
+          # {
+          #   ipv4_address = "1.1.1.1"
+          # }
         ]
       }
     ]
@@ -52,6 +59,13 @@ dns_forwarding_policies = {
           {
             ipv4_address = "8.8.8.8"
           }
+          # Multiple DNS servers example:
+          # {
+          #   ipv4_address = "8.8.4.4"
+          # },
+          # {
+          #   ipv4_address = "1.1.1.1"
+          # }
         ]
       }
     ]
