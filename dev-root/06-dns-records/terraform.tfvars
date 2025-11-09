@@ -1,19 +1,28 @@
-# DNS Records configuration
+# DNS Records configuration - Super simple for developers
 dns_records = {
   api_record = {
-    project_id = "visa-gcp-network"
-    zone_key   = "private_zone"
-    name       = "api.internal.visa.com."
-    type       = "A"
-    ttl        = 300
-    rrdatas    = ["10.10.1.10"]
+    project_id   = "visa-gcp-network"
+    dns_suffix   = "internal.visa.com."  # Domain developers know
+    record_name  = "api"                  # Just the record name!
+    type         = "A"
+    ttl          = 300
+    rrdatas      = ["10.10.1.10"]  # A record: IP addresses
   }
   web_record = {
-    project_id = "visa-gcp-network"
-    zone_key   = "private_zone"
-    name       = "web.internal.visa.com."
-    type       = "A"
-    ttl        = 300
-    rrdatas    = ["10.10.0.10"]
+    project_id   = "visa-gcp-network"
+    dns_suffix   = "internal.visa.com."
+    record_name  = "web"                  # Just the record name!
+    type         = "A"
+    ttl          = 300
+    rrdatas      = ["10.10.0.10"]  # A record: IP addresses
   }
+  # Example CNAME record (commented):
+  # app_cname = {
+  #   project_id   = "visa-gcp-network"
+  #   dns_suffix   = "internal.visa.com."
+  #   record_name  = "app"                  # Just "app", not full FQDN
+  #   type         = "CNAME"
+  #   ttl          = 300
+  #   rrdatas      = ["api.internal.visa.com."]  # CNAME: target domain
+  # }
 }
