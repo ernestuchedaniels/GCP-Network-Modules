@@ -14,7 +14,7 @@ output "dns_forwarding_policies" {
   value = {
     for k, v in module.dns_forwarding_policies : k => {
       policy_id = v.policy_id
-      policy_name = v.policy_name
+      forwarding_zone_ids = v.forwarding_zone_ids
     }
   }
 }

@@ -16,6 +16,7 @@ terraform {
 
 locals {
   environment = "dev"
+  # Test: VPC lookup map implementation
   # Automatically include all available VPCs for DNS visibility
   all_vpc_links = [
     data.terraform_remote_state.networking_core.outputs.main_vpc_self_link,
