@@ -6,7 +6,7 @@ variable "dns_zones" {
     dns_suffix                        = string
     description                       = string
     visibility                        = string
-    # private_visibility_config_networks automatically includes all VPCs
+    vpc_networks                      = list(string)
     labels                            = map(string)
   }))
 }

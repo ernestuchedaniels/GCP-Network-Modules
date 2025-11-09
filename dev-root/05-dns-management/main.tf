@@ -73,7 +73,9 @@ module "dns_zones" {
   description = each.value.description
   visibility  = each.value.visibility
   
-  private_visibility_config_networks = local.all_vpc_links
+  private_visibility_config_networks = [
+    for vpc in each.value.vpc_networks : local.vpc_lookup[vpc]
+  ]
   
   labels = each.value.labels
 }
