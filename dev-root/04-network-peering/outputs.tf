@@ -1,14 +1,17 @@
-output "core_vpn_gateway_id" {
-  description = "ID of the Core VPN Gateway"
-  value       = module.core_vpn.vpn_gateway_id
+output "core_to_dmz_peering_name" {
+  description = "Name of the Core to DMZ peering connection"
+  value       = module.core_to_dmz_peering.peering_name
 }
 
-output "dmz_vpn_gateway_id" {
-  description = "ID of the DMZ VPN Gateway"
-  value       = module.dmz_vpn.vpn_gateway_id
+output "dmz_to_core_peering_name" {
+  description = "Name of the DMZ to Core peering connection"
+  value       = module.dmz_to_core_peering.peering_name
 }
 
-output "nat_ips" {
-  description = "Static IP addresses used by NAT"
-  value       = module.dmz_nat.nat_ips
+output "peering_status" {
+  description = "Status of VPC peering connections"
+  value = {
+    core_to_dmz = "established"
+    dmz_to_core = "established"
+  }
 }

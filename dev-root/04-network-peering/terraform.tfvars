@@ -1,2 +1,3 @@
-# Network peering configuration
-enable_peering = true
+# VPC Peering configuration
+import_custom_routes = true
+export_custom_routes = true
