@@ -24,6 +24,7 @@ module "vpc_peering" {
   
   for_each = var.vpc_peering_connections
   
+  project_id           = var.project_id
   peering_name         = each.value.peering_name
   local_vpc_link       = each.value.local_vpc_link
   peer_vpc_link        = each.value.peer_vpc_link

@@ -1,3 +1,6 @@
+# Project configuration
+project_id = "visa-gcp-network"
+
 # VPC Peering connections configuration
 vpc_peering_connections = {
   core_to_dmz = {
