@@ -28,7 +28,7 @@ subnets = {
   }
   database = {
     app_name                 = "db"
-    cidr_block              = "192.168.300.0/24"
+    cidr_block              = "10.10.2.0/24"
     region                  = "us-central1"
     private_ip_google_access = true
     description             = "Database subnet for dev environment"
