@@ -3,7 +3,7 @@ terraform {
     hostname     = "app.terraform.io"
     organization = "Visa-replica"
     workspaces {
-      name = "dev-06-dns-records"
+      name = "prod-06-dns-records"
     }
   }
   required_providers {
@@ -15,8 +15,7 @@ terraform {
 }
 
 locals {
-  environment = "dev"
-  # Clean DNS decoupling test
+  environment = "prod"
 }
 
 # Read outputs from DNS management stage
@@ -25,7 +24,7 @@ data "terraform_remote_state" "dns_management" {
   config = {
     organization = "Visa-replica"
     workspaces = {
-      name = "dev-05-dns-management"
+      name = "prod-05-dns-management"
     }
   }
 }
