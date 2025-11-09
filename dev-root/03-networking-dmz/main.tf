@@ -22,18 +22,14 @@ locals {
   environment = "dev"
 }
 
-# Create DMZ Host Project
-module "dmz_host_project" {
-  source = "../../modules/gcp-host-project"
-  
-  project_id      = var.dmz_project_id
-  project_name    = "${var.dmz_project_id}-${local.environment}"
-  billing_account = var.billing_account
-  org_id          = var.org_id
-  
-  labels = {
-    environment = local.environment
-    purpose     = "dmz-host"
+# Read outputs from 01-project-setup
+data "terraform_remote_state" "project_setup" {
+  backend = "remote"
+  config = {
+    organization = "Visa-replica"
+    workspaces = {
+      name = "dev-01-project-setup"
+    }
   }
 }
 
@@ -41,7 +37,7 @@ module "dmz_host_project" {
 module "dmz_vpc" {
   source = "../../modules/gcp-vpc"
   
-  project_id              = module.dmz_host_project.project_id
+  project_id              = data.terraform_remote_state.project_setup.outputs.host_project_id
   network_name            = "${local.environment}-dmz-vpc"
   auto_create_subnetworks = false
   routing_mode            = "REGIONAL"
@@ -54,7 +50,7 @@ module "dmz_subnets" {
   
   for_each = var.dmz_subnets
   
-  project_id               = module.dmz_host_project.project_id
+  project_id               = data.terraform_remote_state.project_setup.outputs.host_project_id
   app_name                 = each.value.app_name
   cidr_block              = each.value.cidr_block
   region                  = each.value.region
