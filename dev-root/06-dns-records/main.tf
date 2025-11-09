@@ -16,6 +16,7 @@ terraform {
 
 locals {
   environment = "dev"
+  # Clean DNS decoupling test
 }
 
 # Read outputs from DNS management stage
