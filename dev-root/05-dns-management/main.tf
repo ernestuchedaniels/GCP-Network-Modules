@@ -1,7 +1,7 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "your-tfe-organization"
+    organization = "Visa-replica"
     workspaces {
       name = "dev-05-dns-management"
     }
@@ -22,21 +22,30 @@ locals {
 data "terraform_remote_state" "project_setup" {
   backend = "remote"
   config = {
-    workspace = "dev-01-project-setup"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "dev-01-project-setup"
+    }
   }
 }
 
 data "terraform_remote_state" "networking_core" {
   backend = "remote"
   config = {
-    workspace = "dev-02-networking-core"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "dev-02-networking-core"
+    }
   }
 }
 
 data "terraform_remote_state" "networking_dmz" {
   backend = "remote"
   config = {
-    workspace = "dev-03-networking-dmz"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "dev-03-networking-dmz"
+    }
   }
 }
 
@@ -60,20 +69,6 @@ module "dns_zones" {
   ]
   
   labels = each.value.labels
-}
-
-# Create DNS Records
-module "dns_records" {
-  source = "../../modules/gcp-dns-record"
-  
-  for_each = var.dns_records
-  
-  project_id   = each.value.project_id
-  zone_id      = module.dns_zones[each.value.zone_key].zone_id
-  record_name  = each.value.name
-  record_type  = each.value.type
-  ttl          = each.value.ttl
-  rrdatas      = each.value.rrdatas
 }
 
 # Create DNS Forwarding Policies

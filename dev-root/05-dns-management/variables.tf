@@ -11,18 +11,6 @@ variable "dns_zones" {
   }))
 }
 
-variable "dns_records" {
-  description = "Map of DNS records to create"
-  type = map(object({
-    project_id = string
-    zone_key   = string
-    name       = string
-    type       = string
-    ttl        = number
-    rrdatas    = list(string)
-  }))
-}
-
 variable "dns_forwarding_policies" {
   description = "Map of DNS forwarding policies to create"
   type = map(object({
