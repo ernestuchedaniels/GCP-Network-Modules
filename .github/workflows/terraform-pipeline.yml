@@ -142,8 +142,8 @@ jobs:
         run: |
           RUN_ID="${{ steps.trigger-plan.outputs.run_id }}"
           
-          # Wait for plan to complete (max 5 minutes)
-          for i in {1..30}; do
+          # Wait for plan to complete (max 10 minutes)
+          for i in {1..60}; do
             RUN_RESPONSE=$(curl -s \
               --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
               --header "Content-Type: application/vnd.api+json" \
@@ -156,7 +156,7 @@ jobs:
               break
             fi
             
-            sleep 10
+            sleep 15
           done
           
           # Get plan details and full output
