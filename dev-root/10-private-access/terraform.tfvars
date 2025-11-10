@@ -1,5 +1,5 @@
 # PSC Endpoints - Supports both architectures
-# Updated module with explicit dependency and self_link reference
+# Fixed module address purpose and IP reference
 psc_endpoints = {
   # Architecture 1: Google APIs (using published service attachment)
   google-apis = {
