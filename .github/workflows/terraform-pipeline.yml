@@ -152,7 +152,7 @@ jobs:
             RUN_STATUS=$(echo "$RUN_RESPONSE" | jq -r '.data.attributes.status')
             echo "Run status: $RUN_STATUS"
             
-            if [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "planned_and_finished" || "$RUN_STATUS" == "errored" || "$RUN_STATUS" == "canceled" ]]; then
+            if [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "planned_and_finished" || "$RUN_STATUS" == "errored" || "$RUN_STATUS" == "canceled" || "$RUN_STATUS" == "policy_checked" || "$RUN_STATUS" == "cost_estimated" ]]; then
               break
             fi
             
@@ -167,7 +167,7 @@ jobs:
           echo "**Status:** $RUN_STATUS" >> plan_output.md
           echo "" >> plan_output.md
           
-          if [ "$PLAN_ID" != "null" ] && [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "planned_and_finished" ]]; then
+          if [ "$PLAN_ID" != "null" ] && [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "planned_and_finished" || "$RUN_STATUS" == "policy_checked" || "$RUN_STATUS" == "cost_estimated" ]]; then
             # Get plan logs URL
             PLAN_DETAILS=$(curl -s \
               --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
@@ -242,7 +242,7 @@ jobs:
           if [[ "$RUN_STATUS" == "errored" || "$RUN_STATUS" == "canceled" ]]; then
             echo "❌ Plan failed for workspace ${{ matrix.workspace }}"
             exit 1
-          elif [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "planned_and_finished" ]]; then
+          elif [[ "$RUN_STATUS" == "planned" || "$RUN_STATUS" == "planned_and_finished" || "$RUN_STATUS" == "policy_checked" || "$RUN_STATUS" == "cost_estimated" ]]; then
             echo "✅ Plan succeeded for workspace ${{ matrix.workspace }}"
           else
             echo "⚠️ Unexpected plan status: $RUN_STATUS"
