@@ -16,10 +16,10 @@ terraform {
 
 locals {
   environment = "prod"
-  # Automatically map DNS suffixes to zone IDs
+  # Automatically map DNS suffixes to zone names
   zone_lookup = {
     for zone_key, zone_data in data.terraform_remote_state.dns_management.outputs.dns_zones :
-    zone_data.dns_suffix => zone_data.zone_id
+    zone_data.dns_suffix => zone_data.zone_name
   }
 }
 
