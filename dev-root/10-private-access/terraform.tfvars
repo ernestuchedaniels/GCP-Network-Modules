@@ -1,5 +1,5 @@
 # PSC Endpoints - Supports both architectures
-# Fixed PSC forwarding rule to use address self_link
+# Rewritten PSC module with correct configuration
 psc_endpoints = {
   # Architecture 1: Google APIs (using published service attachment)
   google-apis = {
