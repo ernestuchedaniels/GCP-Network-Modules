@@ -5,5 +5,5 @@ output "policy_id" {
 
 output "forwarding_zone_ids" {
   description = "The IDs of the forwarding zones"
-  value       = google_dns_managed_zone.forwarding_zone[*].id
+  value       = { for k, v in google_dns_managed_zone.forwarding_zone : k => v.id }
 }

@@ -24,11 +24,11 @@ resource "google_dns_policy" "forwarding_policy" {
 }
 
 resource "google_dns_managed_zone" "forwarding_zone" {
-  count       = length(var.forwarding_zones)
+  for_each    = { for idx, zone in var.forwarding_zones : zone.name => zone }
   project     = var.project_id
-  name        = var.forwarding_zones[count.index].name
-  dns_name    = var.forwarding_zones[count.index].dns_name
-  description = var.forwarding_zones[count.index].description
+  name        = each.value.name
+  dns_name    = each.value.dns_name
+  description = each.value.description
   visibility  = "private"
 
   private_visibility_config {
@@ -39,7 +39,7 @@ resource "google_dns_managed_zone" "forwarding_zone" {
 
   forwarding_config {
     dynamic "target_name_servers" {
-      for_each = var.forwarding_zones[count.index].target_name_servers
+      for_each = each.value.target_name_servers
       content {
         ipv4_address = target_name_servers.value.ipv4_address
       }
