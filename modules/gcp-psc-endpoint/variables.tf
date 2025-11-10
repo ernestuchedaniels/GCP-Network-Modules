@@ -13,10 +13,10 @@ variable "endpoint_name" {
   type        = string
 }
 
-variable "service_attachment_uri" {
-  description = "URI of the service attachment"
-  type        = string
-}
+# variable "service_attachment_uri" {
+#   description = "URI of the service attachment"
+#   type        = string
+# }
 
 variable "region" {
   description = "The region where the endpoint will be created"
