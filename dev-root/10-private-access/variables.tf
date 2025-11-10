@@ -10,7 +10,3 @@ variable "psc_endpoints" {
   }))
 }
 
-variable "peering_network_url" {
-  description = "URL of the peer network for VPC peering"
-  type        = string
-}
