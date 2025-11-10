@@ -10,8 +10,9 @@ resource "google_compute_forwarding_rule" "psc_endpoint" {
   project               = var.project_id
   name                  = var.endpoint_name
   region                = var.region
-  ip_address            = google_compute_address.psc_address.address
+  load_balancing_scheme = ""
   target                = var.service_attachment_uri
+  ip_address            = google_compute_address.psc_address.id
   labels                = var.labels
   description           = var.description
   
