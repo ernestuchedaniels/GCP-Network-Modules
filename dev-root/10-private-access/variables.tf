@@ -1,16 +1,8 @@
 variable "psc_endpoints" {
-  description = "Map of PSC endpoints to create"
+  description = "Map of PSC endpoints supporting both architectures: 1) Google APIs (vpc-sc, all-apis) 2) Third-party services (full service attachment URIs)"
   type = map(object({
-    name                   = string
-    subnet_link           = string
-    service_attachment_uri = string
-    region                = string
-    description           = string
-    labels                = map(string)
+    app_name              = string  # Subnet to deploy in (web, db, api, cache)
+    service_attachment_uri = string  # Either Google bundle (vpc-sc) or full URI (projects/...)
   }))
 }
 
-variable "peering_network_url" {
-  description = "URL of the peer network for VPC peering"
-  type        = string
-}

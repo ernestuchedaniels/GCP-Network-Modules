@@ -8,6 +8,8 @@ variable "subnet_link" {
   type        = string
 }
 
+
+
 variable "endpoint_name" {
   description = "Name of the PSC endpoint"
   type        = string
@@ -16,6 +18,7 @@ variable "endpoint_name" {
 variable "service_attachment_uri" {
   description = "URI of the service attachment"
   type        = string
+  default     = null
 }
 
 variable "region" {

@@ -41,13 +41,12 @@ subnets = {
     private_ip_google_access = true
     description             = "Cache subnet for dev environment"
     secondary_ranges        = []
-  }
-  paul = {
-    app_name                 = "paul"
+  lb = {
+    app_name                 = "lb"
     cidr_block              = "10.10.4.0/24"
     region                  = "us-west1"
     private_ip_google_access = true
-    description             = "Paul subnet for dev environment"
+    description             = "Load balancer subnet for dev environment"
     secondary_ranges        = []
   }
 }
