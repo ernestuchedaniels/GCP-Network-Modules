@@ -29,12 +29,6 @@ variable "region" {
   type        = string
 }
 
-variable "ip_address" {
-  description = "Internal IP address for the endpoint (optional)"
-  type        = string
-  default     = null
-}
-
 variable "labels" {
   description = "Labels to apply to the endpoint"
   type        = map(string)
