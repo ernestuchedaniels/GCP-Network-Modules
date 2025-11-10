@@ -1,5 +1,5 @@
 # PSC Endpoints - Supports both architectures
-# Rewritten PSC module with correct configuration
+# Added required network field to PSC forwarding rule
 psc_endpoints = {
   # Architecture 1: Google APIs (using published service attachment)
   google-apis = {
