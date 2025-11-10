@@ -6,6 +6,24 @@ psc_endpoints = {
     service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-googleapis-com"
   }
   
+  # Cloud SQL endpoint
+  cloud_sql = {
+    app_name              = "api"
+    service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-cloud-sql"
+  }
+  
+  # BigQuery endpoint
+  bigquery = {
+    app_name              = "db"
+    service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-bigquery"
+  }
+  
+  # Cloud Storage endpoint
+  storage = {
+    app_name              = "cache"
+    service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-cloud-storage"
+  }
+  
   # Architecture 2: Third-party services (requires producer)
   # custom_service = {
   #   app_name              = "db"
