@@ -1,25 +1,11 @@
-# PSC Endpoints configuration
+# PSC Endpoints for Google Services - Ultra simple configuration
 psc_endpoints = {
-  storage_endpoint = {
-    name                   = "dev-storage-psc"
-    app_name              = "web"  # Uses web app subnet
-    #service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-ilb-consumer-service-attachment"
-    region                = "us-central1"
-    description           = "PSC endpoint for Google Cloud Storage"
-    labels = {
-      environment = "dev"
-      service     = "storage"
-    }
+  storage = {
+    app_name              = "web"
+    service_attachment_uri = "projects/gce-gg-prod/regions/us-central1/serviceAttachments/gcs-us-central1-psc"
   }
-  sql_endpoint = {
-    name                   = "dev-sql-psc"
-    app_name              = "db"  # Uses db app subnet
-    #service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-ilb-consumer-service-attachment"
-    region                = "us-central1"
-    description           = "PSC endpoint for Cloud SQL"
-    labels = {
-      environment = "dev"
-      service     = "sql"
-    }
+  bigquery = {
+    app_name              = "db"
+    service_attachment_uri = "projects/bigquery-p4sa-prod/regions/us-central1/serviceAttachments/bq-us-central1-psc"
   }
 }

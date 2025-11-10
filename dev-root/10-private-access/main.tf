@@ -16,6 +16,12 @@ terraform {
 
 locals {
   environment = "dev"
+  
+  # Derive region from subnet self-link
+  subnet_regions = {
+    for k, v in var.psc_endpoints :
+    k => split("/", data.terraform_remote_state.networking_core.outputs.subnets_by_app[v.app_name])[8]
+  }
 }
 
 # Read outputs from previous stages
@@ -52,16 +58,21 @@ data "terraform_remote_state" "networking_core" {
 
 
 
-# Create PSC Endpoints
+# Create PSC Endpoints for Google Services
 module "psc_endpoints" {
   source = "../../modules/gcp-psc-endpoint"
   
   for_each = var.psc_endpoints
+  
   project_id             = data.terraform_remote_state.project_setup.outputs.host_project_id
-  endpoint_name          = each.value.name
+  endpoint_name          = "${local.environment}-${each.key}-psc"
   subnet_link            = data.terraform_remote_state.networking_core.outputs.subnets_by_app[each.value.app_name]
-  #service_attachment_uri = each.value.service_attachment_uri
-  region                 = each.value.region
-  description            = each.value.description
-  labels = each.value.labels
+  service_attachment_uri = each.value.service_attachment_uri
+  region                 = local.subnet_regions[each.key]
+  description            = "PSC endpoint for ${each.key} in ${each.value.app_name} subnet"
+  labels = {
+    environment = local.environment
+    app         = each.value.app_name
+    service     = each.key
+  }
 }
