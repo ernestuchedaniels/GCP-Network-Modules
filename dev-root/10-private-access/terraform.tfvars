@@ -1,13 +1,13 @@
 # PSC Endpoints - Supports both architectures
 psc_endpoints = {
   # Architecture 1: Google APIs (using published service attachment)
-  google_apis = {
+  google-apis = {
     app_name              = "web"
     service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-googleapis-com"
   }
   
   # Cloud SQL endpoint
-  cloud_sql = {
+  cloud-sql = {
     app_name              = "api"
     service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-cloud-sql"
   }

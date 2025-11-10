@@ -5,7 +5,6 @@ resource "google_compute_forwarding_rule" "psc_endpoint" {
   load_balancing_scheme = ""
   target                = var.service_attachment_uri
   subnetwork            = var.subnet_link
-  ip_address            = var.ip_address
   labels                = var.labels
   description           = var.description
 }

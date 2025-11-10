@@ -65,7 +65,7 @@ module "psc_endpoints" {
   for_each = var.psc_endpoints
   
   project_id             = data.terraform_remote_state.project_setup.outputs.host_project_id
-  endpoint_name          = "${local.environment}-${each.key}-psc"
+  endpoint_name          = "${local.environment}-${replace(each.key, "_", "-")}-psc"
   subnet_link            = data.terraform_remote_state.networking_core.outputs.subnets_by_app[each.value.app_name]
   service_attachment_uri = each.value.service_attachment_uri
   region                 = local.subnet_regions[each.key]
