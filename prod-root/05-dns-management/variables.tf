@@ -32,3 +32,11 @@ variable "dns_forwarding_policies" {
     }))
   }))
 }
+
+variable "vpc_mappings" {
+  description = "Map friendly VPC names to actual VPC self-links"
+  type = list(object({
+    name          = string
+    vpc_self_link = string
+  }))
+}
