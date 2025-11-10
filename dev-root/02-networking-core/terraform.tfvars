@@ -41,6 +41,7 @@ subnets = {
     private_ip_google_access = true
     description             = "Cache subnet for dev environment"
     secondary_ranges        = []
+  }
   lb = {
     app_name                 = "lb"
     cidr_block              = "10.10.4.0/24"
