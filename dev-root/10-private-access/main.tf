@@ -1,8 +1,11 @@
 terraform {
+  backend "remote" {
+    hostname     = "app.terraform.io"
+    organization = "Visa-replica"
+    workspaces {
+      name = "dev-10-private-access"
+    }
   }
-}
-
-terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -16,44 +19,49 @@ locals {
 }
 
 # Read outputs from previous stages
-data "terraform_remote_state" "networking_core" {
+data "terraform_remote_state" "project_setup" {
   backend = "remote"
   config = {
-    workspace = "dev-01-project-setup"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "dev-01-project-setup"
+    }
   }
 }
 
-data "terraform_remote_state" "service_projects" {
+data "terraform_remote_state" "networking_core" {
   backend = "remote"
   config = {
-    workspace = "dev-01-project-setup"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "dev-02-networking-core"
+    }
   }
 }
+
+# Uncomment when using service projects
+# data "terraform_remote_state" "service_projects" {
+#   backend = "remote"
+#   config = {
+#     organization = "Visa-replica"
+#     workspaces = {
+#       name = "dev-09-service-projects"
+#     }
+#   }
+# }
+
+
 
 # Create PSC Endpoints
 module "psc_endpoints" {
   source = "../../modules/gcp-psc-endpoint"
   
   for_each = var.psc_endpoints
-  
-  project_id             = data.terraform_remote_state.service_projects.outputs.app_service_project_id
+  project_id             = data.terraform_remote_state.project_setup.outputs.project_id
   endpoint_name          = each.value.name
-  subnet_link            = each.value.subnet_link
-  service_attachment_uri = each.value.service_attachment_uri
+  subnet_link            = data.terraform_remote_state.networking_core.outputs.subnets[each.value.app_name]
+  #service_attachment_uri = each.value.service_attachment_uri
   region                 = each.value.region
   description            = each.value.description
-  
   labels = each.value.labels
-}
-
-# Create VPC Peering (if needed)
-module "vpc_peering" {
-  source = "../../modules/gcp-vpc-peering"
-  
-  project_id           = data.terraform_remote_state.service_projects.outputs.app_service_project_id
-  peering_name         = "${local.environment}-vpc-peering"
-  local_vpc_link       = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
-  peer_vpc_link        = var.peering_network_url
-  import_custom_routes = true
-  export_custom_routes = true
 }
