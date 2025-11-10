@@ -2,8 +2,9 @@ output "dns_zones" {
   description = "Map of created DNS zones"
   value = {
     for k, v in module.dns_zones : k => {
-      zone_id   = v.zone_id
-      zone_name = v.zone_name
+      zone_id      = v.zone_id
+      zone_name    = v.zone_name
+      dns_suffix   = v.dns_suffix
       name_servers = v.name_servers
     }
   }

@@ -12,3 +12,8 @@ output "name_servers" {
   description = "The name servers for the DNS zone"
   value       = google_dns_managed_zone.zone.name_servers
 }
+
+output "dns_suffix" {
+  description = "The DNS suffix/domain name for the zone"
+  value       = google_dns_managed_zone.zone.dns_name
+}

@@ -16,17 +16,11 @@ terraform {
 
 locals {
   environment = "dev"
-  # Test: VPC lookup map implementation
-  # Automatically include all available VPCs for DNS visibility
-  all_vpc_links = [
-    data.terraform_remote_state.networking_core.outputs.main_vpc_self_link,
-    data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link
-  ]
   
-  # VPC lookup map for flexible network selection
+  # VPC lookup from tfvars - completely data-driven
   vpc_lookup = {
-    "CORE_VPC" = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
-    "DMZ_VPC"  = data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link
+    for vpc in var.vpc_mappings :
+    vpc.name => vpc.vpc_self_link
   }
 }
 

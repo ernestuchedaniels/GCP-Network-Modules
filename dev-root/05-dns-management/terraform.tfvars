@@ -69,3 +69,15 @@ dns_forwarding_policies = {
     ]
   }
 }
+
+# VPC Mappings - completely data-driven configuration
+vpc_mappings = [
+  {
+    name          = "CORE_VPC"
+    vpc_self_link = "https://www.googleapis.com/compute/v1/projects/visa-gcp-network/global/networks/dev-shared-vpc"
+  },
+  {
+    name          = "DMZ_VPC"
+    vpc_self_link = "https://www.googleapis.com/compute/v1/projects/visa-gcp-network/global/networks/dev-dmz-vpc"
+  }
+]
