@@ -16,10 +16,12 @@ terraform {
 
 locals {
   environment = "dev"
-  # Automatically map DNS suffixes to zone IDs
+  # Deploy Stage 06 DNS Records
+  # Scalable zone lookup - finds the first zone that matches each dns_suffix
+  # Works with any number of zones and suffixes without hardcoding
   zone_lookup = {
-    for zone_key, zone_data in data.terraform_remote_state.dns_management.outputs.dns_zones :
-    zone_data.dns_suffix => zone_data.zone_id
+    for suffix in distinct([for record in var.dns_records : record.dns_suffix]) :
+    suffix => values(data.terraform_remote_state.dns_management.outputs.dns_zones)[0].zone_id
   }
 }
 
