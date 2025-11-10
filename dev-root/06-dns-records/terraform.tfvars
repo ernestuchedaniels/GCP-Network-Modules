@@ -16,7 +16,7 @@ dns_records = {
     ttl          = 300
     rrdatas      = ["10.10.0.10"]  # A record: IP addresses
   }
-  web_record = {
+  db_record = {
     project_id   = "visa-gcp-network"
     dns_suffix   = "internal.visa.com."
     record_name  = "db"                  # Just the record name!
