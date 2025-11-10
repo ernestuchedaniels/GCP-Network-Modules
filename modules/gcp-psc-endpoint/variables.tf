@@ -8,7 +8,10 @@ variable "subnet_link" {
   type        = string
 }
 
-
+variable "network_link" {
+  description = "The self-link of the network"
+  type        = string
+}
 
 variable "endpoint_name" {
   description = "Name of the PSC endpoint"
