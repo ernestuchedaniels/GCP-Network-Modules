@@ -1,28 +1,11 @@
 # PSC Endpoints - Supports both architectures
-# Added required network field to PSC forwarding rule
+# Using all-apis service attachment provides access to all Google APIs
+# (BigQuery, Cloud SQL, Storage, etc.) through a single PSC endpoint
 psc_endpoints = {
-  # Architecture 1: Google APIs (using published service attachment)
-  google-apis = {
+  # Google APIs endpoint (provides access to all Google APIs)
+  all-google-apis = {
     app_name              = "web"
-    service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-googleapis-com"
-  }
-  
-  # Cloud SQL endpoint
-  cloud-sql = {
-    app_name              = "api"
-    service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-cloud-sql"
-  }
-  
-  # BigQuery endpoint
-  bigquery = {
-    app_name              = "db"
-    service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-bigquery"
-  }
-  
-  # Cloud Storage endpoint
-  storage = {
-    app_name              = "cache"
-    service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-cloud-storage"
+    service_attachment_uri = "projects/servicenetworking-googleapis-com/regions/us-central1/serviceAttachments/all-apis"
   }
   
   # Architecture 2: Third-party services (requires producer)
