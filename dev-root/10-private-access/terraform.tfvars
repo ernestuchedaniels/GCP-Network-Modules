@@ -1,5 +1,5 @@
 # PSC Endpoints - Supports both architectures
-# Removed unused ip_address variable from PSC module
+# Fixed network_link to use correct output name
 psc_endpoints = {
   # Architecture 1: Google APIs (using published service attachment)
   google-apis = {
