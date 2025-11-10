@@ -30,3 +30,13 @@ variable "dns_forwarding_policies" {
     }))
   }))
 }
+
+variable "vpc_mappings" {
+  description = "VPC mappings - completely data-driven from tfvars"
+  type = list(object({
+    name          = string  # VPC name (e.g., CORE_VPC, DMZ_VPC)
+    vpc_self_link = string  # VPC self-link URL
+  }))
+  default = []
+}
+
