@@ -1,4 +1,5 @@
 # PSC Endpoints - Supports both architectures
+# Updated module to include compute address for IP allocation
 psc_endpoints = {
   # Architecture 1: Google APIs (using published service attachment)
   google-apis = {
