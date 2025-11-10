@@ -1,11 +1,14 @@
-# PSC Endpoints for Google Services - Ultra simple configuration
+# PSC Endpoints - Supports both architectures
 psc_endpoints = {
-  storage = {
+  # Architecture 1: Google APIs (using published service attachment)
+  google_apis = {
     app_name              = "web"
-    service_attachment_uri = "projects/gce-gg-prod/regions/us-central1/serviceAttachments/gcs-us-central1-psc"
+    service_attachment_uri = "projects/service-networking/regions/us-central1/serviceAttachments/psc-googleapis-com"
   }
-  bigquery = {
-    app_name              = "db"
-    service_attachment_uri = "projects/bigquery-p4sa-prod/regions/us-central1/serviceAttachments/bq-us-central1-psc"
-  }
+  
+  # Architecture 2: Third-party services (requires producer)
+  # custom_service = {
+  #   app_name              = "db"
+  #   service_attachment_uri = "projects/producer-project/regions/us-central1/serviceAttachments/my-service"
+  # }
 }
