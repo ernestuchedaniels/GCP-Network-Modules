@@ -58,7 +58,7 @@ data "terraform_remote_state" "networking_core" {
 
 
 
-# Create PSC Endpoints for Google Services
+# Create PSC Endpoints using our custom module (wraps official Google module)
 module "psc_endpoints" {
   source = "../../modules/gcp-psc-endpoint"
   
