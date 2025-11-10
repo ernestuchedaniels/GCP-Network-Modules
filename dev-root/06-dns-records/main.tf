@@ -16,6 +16,7 @@ terraform {
 
 locals {
   environment = "dev"
+  # Test Stage 06 DNS Records deployment
   # Automatically map DNS suffixes to zone IDs
   zone_lookup = {
     for zone_key, zone_data in data.terraform_remote_state.dns_management.outputs.dns_zones :

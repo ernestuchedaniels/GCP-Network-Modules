@@ -69,3 +69,15 @@ dns_forwarding_policies = {
     ]
   }
 }
+
+# VPC Mappings - Data-driven VPC configuration
+vpc_mappings = [
+  {
+    name          = "CORE_VPC"
+    vpc_self_link = "projects/visa-gcp-network/global/networks/prod-core-vpc"
+  },
+  {
+    name          = "DMZ_VPC"
+    vpc_self_link = "projects/visa-gcp-network/global/networks/prod-dmz-vpc"
+  }
+]
