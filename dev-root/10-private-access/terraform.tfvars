@@ -1,9 +1,5 @@
-# Google API PSC Endpoints (global)
-google_api_endpoints = {
-  allapis = {
-    service_bundle = "all-apis"
-  }
-}
+# Google API PSC Endpoints (global) - Temporarily disabled for state cleanup
+google_api_endpoints = {}
 
 # Third-party PSC Endpoints (regional)
 psc_endpoints = {
