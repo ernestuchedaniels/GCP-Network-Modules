@@ -4,7 +4,17 @@ variable "project_id" {
 }
 
 variable "endpoint_name" {
-  description = "Name of the PSC endpoint (alphanumeric only, <20 chars)"
+  description = "Name of the PSC endpoint"
+  type        = string
+}
+
+variable "region" {
+  description = "The region for the PSC endpoint"
+  type        = string
+}
+
+variable "subnetwork" {
+  description = "The self-link of the subnet"
   type        = string
 }
 
@@ -14,6 +24,6 @@ variable "network" {
 }
 
 variable "target" {
-  description = "The Google API bundle (e.g., all-apis, vpc-sc)"
+  description = "The service attachment URI"
   type        = string
 }

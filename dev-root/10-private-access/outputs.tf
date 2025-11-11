@@ -1,8 +1,19 @@
-output "psc_endpoints" {
-  description = "Map of created PSC endpoints with IPs"
+output "google_api_psc_endpoints" {
+  description = "Google API PSC endpoint details"
   value = {
-    for k, v in module.psc_endpoints : k => {
-      ip = v.psc_internal_ip
+    for k, v in module.google_api_psc : k => {
+      ip                 = v.psc_endpoint_ip
+      forwarding_rule_id = v.forwarding_rule_id
+    }
+  }
+}
+
+output "service_attachment_psc_endpoints" {
+  description = "Service attachment PSC endpoint details"
+  value = {
+    for k, v in module.service_attachment_psc : k => {
+      ip                 = v.psc_endpoint_ip
+      forwarding_rule_id = v.forwarding_rule_id
     }
   }
 }
