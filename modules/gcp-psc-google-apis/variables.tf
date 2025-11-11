@@ -17,9 +17,3 @@ variable "service_bundle" {
   description = "Google API bundle (e.g., all-apis)"
   type        = string
 }
-
-variable "labels" {
-  description = "Labels to apply to the endpoint"
-  type        = map(string)
-  default     = {}
-}

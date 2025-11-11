@@ -1,4 +1,4 @@
-# Google API PSC Endpoints (global) - No separate address needed
+# Google API PSC Endpoints (global) - Removed labels
 google_api_endpoints = {
   all-google-apis = {
     service_bundle = "all-apis"
