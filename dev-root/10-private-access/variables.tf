@@ -1,11 +1,3 @@
-variable "google_api_endpoints" {
-  description = "Map of Google API PSC endpoints (global)"
-  type = map(object({
-    service_bundle = string  # Google API bundle (e.g., all-apis)
-  }))
-  default = {}
-}
-
 variable "psc_endpoints" {
   description = "Map of third-party PSC endpoints (regional)"
   type = map(object({
