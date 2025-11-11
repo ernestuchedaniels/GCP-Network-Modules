@@ -52,7 +52,7 @@ subnets = {
   }
   demo = {
     app_name                 = "cj-demo"
-    cidr_block              = "10.10.4.0/24"
+    cidr_block              = "10.10.5.0/24"
     region                  = "us-west1"
     private_ip_google_access = true
     description             = "Load balancer subnet for dev environment"
