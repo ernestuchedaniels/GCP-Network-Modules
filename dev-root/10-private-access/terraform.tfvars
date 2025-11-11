@@ -3,7 +3,6 @@ psc_google_apis = {
   allapis = {
     target = "all-apis"
   }
-}
 
 # Third-party PSC Service Attachments (regional)
 psc_service_attachments = {
