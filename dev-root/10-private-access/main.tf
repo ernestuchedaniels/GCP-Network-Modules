@@ -57,16 +57,16 @@ module "google_api_psc" {
   target        = each.value.target
 }
 
-# Third-party PSC Endpoints (regional)
-module "service_attachment_psc" {
-  source = "../../modules/gcp-psc-service-attachment"
-  
-  for_each = var.psc_service_attachments
-  
-  project_id    = data.terraform_remote_state.project_setup.outputs.host_project_id
-  endpoint_name = "${local.environment}-${each.key}-psc"
-  region        = local.service_attachment_regions[each.key]
-  subnetwork    = data.terraform_remote_state.networking_core.outputs.subnets_by_app[each.value.app_name]
-  network       = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
-  target        = each.value.target
-}
+# Third-party PSC Endpoints (regional) - Commented out to focus on Google API PSC first
+# module "service_attachment_psc" {
+#   source = "../../modules/gcp-psc-service-attachment"
+#   
+#   for_each = var.psc_service_attachments
+#   
+#   project_id    = data.terraform_remote_state.project_setup.outputs.host_project_id
+#   endpoint_name = "${local.environment}-${each.key}-psc"
+#   region        = local.service_attachment_regions[each.key]
+#   subnetwork    = data.terraform_remote_state.networking_core.outputs.subnets_by_app[each.value.app_name]
+#   network       = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
+#   target        = each.value.target
+# }
