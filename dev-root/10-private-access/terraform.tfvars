@@ -1,4 +1,4 @@
-# Google API PSC Endpoints (global)
+# Google API PSC Endpoints (global) - Fixed address reference
 google_api_endpoints = {
   all-google-apis = {
     service_bundle = "all-apis"
