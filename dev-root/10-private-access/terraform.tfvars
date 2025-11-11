@@ -1,4 +1,4 @@
-# Google API PSC Endpoints (global)
+# Google API PSC Endpoints (global) - Redesigned following Google's pattern
 psc_google_apis = {
   allapis = {
     target = "all-apis"
