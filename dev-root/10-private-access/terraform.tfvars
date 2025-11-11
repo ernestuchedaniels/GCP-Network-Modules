@@ -1,4 +1,4 @@
-# Google API PSC Endpoints (global) - Redesigned following Google's pattern
+# Google API PSC Endpoints (global) - Testing without purpose field
 psc_google_apis = {
   allapis = {
     target = "all-apis"
