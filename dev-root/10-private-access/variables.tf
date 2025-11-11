@@ -1,17 +1,16 @@
-variable "google_api_endpoints" {
+variable "psc_google_apis" {
   description = "Map of Google API PSC endpoints (global)"
   type = map(object({
-    service_bundle = string
+    target = string  # Google API bundle (e.g., all-apis, vpc-sc)
   }))
   default = {}
 }
 
-variable "psc_endpoints" {
-  description = "Map of third-party PSC endpoints (regional)"
+variable "psc_service_attachments" {
+  description = "Map of third-party PSC service attachments (regional)"
   type = map(object({
-    app_name              = string  # Subnet to deploy in (web, db, api, cache)
-    service_attachment_uri = string  # Full service attachment URI (projects/...)
+    app_name = string  # Subnet to deploy in (web, db, api, cache, lb)
+    target   = string  # Service attachment URI
   }))
   default = {}
 }
-

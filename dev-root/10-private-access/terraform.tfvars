@@ -1,15 +1,15 @@
 # Google API PSC Endpoints (global)
-google_api_endpoints = {
+psc_google_apis = {
   allapis = {
-    service_bundle = "all-apis"
+    target = "all-apis"
   }
 }
 
-# Third-party PSC Endpoints (regional)
-psc_endpoints = {
-  # Example: Third-party service (requires producer service attachment)
+# Third-party PSC Service Attachments (regional)
+psc_service_attachments = {
+  # Example: Uncomment and configure when you have a producer service
   # custom-service = {
-  #   app_name              = "web"
-  #   service_attachment_uri = "projects/producer-project/regions/us-central1/serviceAttachments/my-service"
+  #   app_name = "web"
+  #   target   = "projects/producer-project/regions/us-central1/serviceAttachments/my-service"
   # }
 }
