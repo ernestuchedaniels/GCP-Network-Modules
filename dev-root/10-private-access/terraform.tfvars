@@ -1,5 +1,5 @@
 # Google API PSC Endpoints (global)
-#google_api_endpoints = {
+google_api_endpoints = {
   #allapis = {
     #service_bundle = "all-apis"
   #}
