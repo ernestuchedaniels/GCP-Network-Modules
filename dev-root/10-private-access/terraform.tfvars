@@ -1,4 +1,4 @@
-# Google API PSC Endpoints (global) - Auto-allocate address
+# Google API PSC Endpoints (global) - No separate address needed
 google_api_endpoints = {
   all-google-apis = {
     service_bundle = "all-apis"
