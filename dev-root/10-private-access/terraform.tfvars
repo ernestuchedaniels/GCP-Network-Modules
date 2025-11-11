@@ -1,6 +1,11 @@
-# PSC Endpoints - Third-party service attachments only
-# Note: Google API bundles (all-apis) require global forwarding rules
-# and cannot be used with this regional PSC module
+# Google API PSC Endpoints (global)
+google_api_endpoints = {
+  all-google-apis = {
+    service_bundle = "all-apis"
+  }
+}
+
+# Third-party PSC Endpoints (regional)
 psc_endpoints = {
   # Example: Third-party service (requires producer service attachment)
   # custom-service = {
