@@ -18,10 +18,10 @@ locals {
   environment = "dev"
   
   # Derive region from subnet self-link for service attachments
-  service_attachment_regions = {
-    for k, v in var.psc_service_attachments :
-    k => split("/", data.terraform_remote_state.networking_core.outputs.subnets_by_app[v.app_name])[8]
-  }
+  # service_attachment_regions = {
+  #   for k, v in var.psc_service_attachments :
+  #   k => split("/", data.terraform_remote_state.networking_core.outputs.subnets_by_app[v.app_name])[8]
+  # }
 }
 
 # Read outputs from previous stages
