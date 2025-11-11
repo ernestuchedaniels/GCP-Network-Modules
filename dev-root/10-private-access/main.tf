@@ -57,6 +57,7 @@ module "google_api_psc" {
   target        = each.value.target
 }
 
+
 # Third-party PSC Endpoints (regional) - Commented out to focus on Google API PSC first
 # module "service_attachment_psc" {
 #   source = "../../modules/gcp-psc-service-attachment"
