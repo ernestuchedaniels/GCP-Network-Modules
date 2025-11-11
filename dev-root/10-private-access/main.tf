@@ -68,10 +68,6 @@ module "google_api_endpoints" {
   endpoint_name = "${local.environment}-${each.key}"
   network_link  = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
   service_bundle = each.value.service_bundle
-  labels = {
-    environment = local.environment
-    service     = each.key
-  }
 }
 
 # Third-party PSC Endpoints (regional)
