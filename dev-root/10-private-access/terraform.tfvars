@@ -1,16 +1,10 @@
-# PSC Endpoints - Supports both architectures
-# Using global all-apis bundle provides access to all Google APIs
-# (BigQuery, Cloud SQL, Storage, etc.) through a single PSC endpoint
+# PSC Endpoints - Third-party service attachments only
+# Note: Google API bundles (all-apis) require global forwarding rules
+# and cannot be used with this regional PSC module
 psc_endpoints = {
-  # Google APIs endpoint (provides access to all Google APIs)
-  all-google-apis = {
-    app_name              = "web"
-    service_attachment_uri = "all-apis"
-  }
-  
-  # Architecture 2: Third-party services (requires producer)
-  # custom_service = {
-  #   app_name              = "db"
+  # Example: Third-party service (requires producer service attachment)
+  # custom-service = {
+  #   app_name              = "web"
   #   service_attachment_uri = "projects/producer-project/regions/us-central1/serviceAttachments/my-service"
   # }
 }
