@@ -1,5 +1,9 @@
-# PSC for Google APIs requires Private Google Access, not PSC endpoints
-# Use Private Google Access on subnets instead
+# Google API PSC Endpoints (global)
+google_api_endpoints = {
+  allapis = {
+    service_bundle = "all-apis"
+  }
+}
 
 # Third-party PSC Endpoints (regional)
 psc_endpoints = {

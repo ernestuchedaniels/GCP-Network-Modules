@@ -58,6 +58,18 @@ data "terraform_remote_state" "networking_core" {
 
 
 
+# Google API PSC Endpoints (global)
+module "google_api_endpoints" {
+  source = "../../modules/gcp-psc-google-apis"
+  
+  for_each = var.google_api_endpoints
+  
+  project_id    = data.terraform_remote_state.project_setup.outputs.host_project_id
+  endpoint_name = replace("${local.environment}${each.key}", "-", "")
+  network_link  = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
+  service_bundle = each.value.service_bundle
+}
+
 # Third-party PSC Endpoints (regional)
 module "psc_endpoints" {
   source = "../../modules/gcp-psc-endpoint"
