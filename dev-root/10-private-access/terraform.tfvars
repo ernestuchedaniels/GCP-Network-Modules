@@ -1,4 +1,4 @@
-# Google API PSC Endpoints (global) - Shortened name
+# Google API PSC Endpoints (global) - No hyphens in name
 google_api_endpoints = {
   all-google-apis = {
     service_bundle = "all-apis"
