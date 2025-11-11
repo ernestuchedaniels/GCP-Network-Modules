@@ -55,7 +55,6 @@ module "google_api_psc" {
   endpoint_name = replace("${local.environment}${each.key}", "-", "")
   network       = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
   target        = each.value.target
-  address       = each.value.address
 }
 
 # Third-party PSC Endpoints (regional)
