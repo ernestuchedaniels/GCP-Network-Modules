@@ -1,10 +1,9 @@
 resource "google_compute_global_address" "psc_address" {
-  project       = var.project_id
-  name          = "${var.endpoint_name}-ip"
-  address_type  = "INTERNAL"
-  purpose       = "PRIVATE_SERVICE_CONNECT"
-  network       = var.network_link
-  prefix_length = 16
+  project      = var.project_id
+  name         = "${var.endpoint_name}-ip"
+  address_type = "INTERNAL"
+  purpose      = "PRIVATE_SERVICE_CONNECT"
+  network      = var.network_link
 }
 
 resource "google_compute_global_forwarding_rule" "psc_endpoint" {
