@@ -24,7 +24,7 @@ variable "subnetwork" {
 }
 
 variable "target" {
-  description = "The Google API service (e.g., storage.us-west1.rep.googleapis.com)"
+  description = "The Google API service FQDN (e.g., bigquery.us-west1.rep.googleapis.com)"
   type        = string
 }
 
