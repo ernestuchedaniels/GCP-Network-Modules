@@ -9,7 +9,7 @@ psc_google_apis = {
 # Google API PSC Endpoints (regional)
 psc_google_apis_regional = {
   storage = {
-    target        = "storage.us-west1.rep.googleapis.com"
+    target        = "storage.us-west1.p.gcp-sa.net"
     region        = "us-west1"
     app_name      = "cache"
     global_access = true
