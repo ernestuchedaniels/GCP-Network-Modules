@@ -1,7 +1,8 @@
-# Google API PSC Endpoints (global) - Testing without purpose field
+# Google API PSC Endpoints (global)
 psc_google_apis = {
   allapis = {
-    target = "all-apis"
+    target     = "all-apis"
+    ip_address = "10.10.100.1"
   }
 }
 # Third-party PSC Service Attachments (regional)

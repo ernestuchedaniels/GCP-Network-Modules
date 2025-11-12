@@ -17,3 +17,8 @@ variable "target" {
   description = "The Google API bundle (e.g., all-apis, vpc-sc)"
   type        = string
 }
+
+variable "ip_address" {
+  description = "Internal IP address for the PSC endpoint"
+  type        = string
+}
