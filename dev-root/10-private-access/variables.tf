@@ -10,7 +10,7 @@ variable "psc_google_apis" {
 variable "psc_google_apis_regional" {
   description = "Map of regional Google API PSC endpoints"
   type = map(object({
-    target        = string  # Google API service (e.g., storage.us-west1.rep.googleapis.com)
+    target        = string  # Google API service connection URI (e.g., storage.us-west1.p.gcp-sa.net)
     region        = string  # GCP region
     app_name      = string  # Subnet to deploy in (web, db, api, cache, lb)
     global_access = optional(bool, false)  # Enable global access
