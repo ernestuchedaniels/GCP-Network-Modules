@@ -58,20 +58,20 @@ module "google_api_psc" {
   ip_address    = each.value.ip_address
 }
 
-# Google API PSC Endpoints (regional)
-module "google_api_psc_regional" {
-  source = "../../modules/gcp-psc-google-apis-regional"
-  
-  for_each = var.psc_google_apis_regional
-  
-  project_id    = data.terraform_remote_state.project_setup.outputs.host_project_id
-  endpoint_name = "${local.environment}${each.key}"
-  region        = each.value.region
-  network       = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
-  subnetwork    = data.terraform_remote_state.networking_core.outputs.subnets_by_app[each.value.app_name]
-  target        = each.value.target
-  global_access = each.value.global_access
-}
+# Google API PSC Endpoints (regional) - Commented out pending service attachment resolution
+# module "google_api_psc_regional" {
+#   source = "../../modules/gcp-psc-google-apis-regional"
+#   
+#   for_each = var.psc_google_apis_regional
+#   
+#   project_id    = data.terraform_remote_state.project_setup.outputs.host_project_id
+#   endpoint_name = "${local.environment}${each.key}"
+#   region        = each.value.region
+#   network       = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
+#   subnetwork    = data.terraform_remote_state.networking_core.outputs.subnets_by_app[each.value.app_name]
+#   target        = each.value.target
+#   global_access = each.value.global_access
+# }
 
 # Third-party PSC Endpoints (regional) - Commented out to focus on Google API PSC first
 # module "service_attachment_psc" {
