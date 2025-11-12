@@ -52,7 +52,7 @@ module "google_api_psc" {
   for_each = var.psc_google_apis
   
   project_id    = data.terraform_remote_state.project_setup.outputs.host_project_id
-  endpoint_name = replace("${local.environment}${each.key}", "-", "")
+  endpoint_name = "${local.environment}${each.key}"
   network       = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
   target        = each.value.target
   ip_address    = each.value.ip_address
