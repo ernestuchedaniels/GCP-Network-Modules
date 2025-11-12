@@ -13,7 +13,7 @@ resource "google_compute_forwarding_rule" "psc_endpoint" {
   region                = var.region
   network               = var.network
   ip_address            = google_compute_address.psc_address.id
-  target                = var.target
+  target                = "projects/servicenetworking-googleapis-com/regions/${var.region}/serviceAttachments/${var.target}"
   load_balancing_scheme = ""
   allow_global_access   = var.global_access
 }
