@@ -1,7 +1,8 @@
 variable "psc_google_apis" {
   description = "Map of Google API PSC endpoints (global)"
   type = map(object({
-    target = string  # Google API bundle (e.g., all-apis, vpc-sc)
+    target     = string  # Google API bundle (e.g., all-apis, vpc-sc)
+    ip_address = string  # Internal IP address for the endpoint
   }))
   default = {}
 }

@@ -4,6 +4,7 @@ resource "google_compute_global_address" "psc_address" {
   address_type = "INTERNAL"
   purpose      = "PRIVATE_SERVICE_CONNECT"
   network      = var.network
+  address      = var.ip_address
 }
 
 resource "google_compute_global_forwarding_rule" "psc_endpoint" {
