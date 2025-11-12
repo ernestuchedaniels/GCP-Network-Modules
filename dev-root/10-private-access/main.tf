@@ -45,7 +45,7 @@ data "terraform_remote_state" "networking_core" {
   }
 }
 
-# Google API PSC Endpoints (global)
+# Google API PSC Endpoints (global) 
 module "google_api_psc" {
   source = "../../modules/gcp-psc-google-apis"
   
