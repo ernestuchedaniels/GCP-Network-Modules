@@ -1,8 +1,8 @@
 # GCP Network Modules - Infrastructure as Code
 
-> **Living Documentation** - Last Updated: January 2025  
+> **Living Documentation** - Last Updated: November 2025  
 > **Version**: 1.0.0  
-> **Terraform Version**: 1.6.6
+> **Terraform Version**: 1.13.5
 
 ## 🏗️ Architecture Overview
 
