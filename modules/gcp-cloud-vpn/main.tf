@@ -13,6 +13,7 @@ resource "google_compute_vpn_tunnel" "tunnels" {
   name                  = "${var.tunnel_name_prefix}-tunnel-${count.index + 1}"
   region                = var.region
   project               = var.project_id
+  router                = var.router_name
   vpn_gateway           = google_compute_ha_vpn_gateway.vpn_gateway.id
   peer_gcp_gateway      = var.peer_vpn_gateway_id
   shared_secret         = var.shared_secrets[count.index]
