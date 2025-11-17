@@ -45,6 +45,5 @@ module "dns_records" {
   zone_id      = local.zone_lookup[each.value.dns_suffix]
   record_name  = "${each.value.record_name}.${each.value.dns_suffix}"
   record_type  = each.value.type
-  ttl          = each.value.ttl
   rrdatas      = each.value.rrdatas
 }

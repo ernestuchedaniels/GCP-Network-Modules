@@ -5,7 +5,6 @@ dns_records = {
     dns_suffix   = "internal.visa.com."  # Domain developers know
     record_name  = "api"                  # Just the record name!
     type         = "A"
-    ttl          = 300
     rrdatas      = ["10.10.1.10"]  # A record: IP addresses
   }
   web_record = {
@@ -13,7 +12,6 @@ dns_records = {
     dns_suffix   = "internal.visa.com."
     record_name  = "web"                  # Just the record name!
     type         = "A"
-    ttl          = 300
     rrdatas      = ["10.10.0.10"]  # A record: IP addresses
   }
   db_record = {
@@ -21,7 +19,6 @@ dns_records = {
     dns_suffix   = "internal.visa.com."
     record_name  = "db"                  # Just the record name!
     type         = "A"
-    ttl          = 300
     rrdatas      = ["10.10.2.10"]  # A record: IP addresses
   }
   # Example CNAME record (commented):
@@ -30,7 +27,6 @@ dns_records = {
   #   dns_suffix   = "internal.visa.com."
   #   record_name  = "app"                  # Just "app", not full FQDN
   #   type         = "CNAME"
-  #   ttl          = 300
   #   rrdatas      = ["api.internal.visa.com."]  # CNAME: target domain
   # }
 }
