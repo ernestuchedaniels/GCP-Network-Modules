@@ -1,10 +1,11 @@
 # Hybrid connectivity configuration
 region = "us-central1"
 
-# HA VPN Configuration 
+# HA VPN Configuration
 enable_vpn              = true
 vpn_region              = "us-central1"
-peer_vpn_gateway_id     = "projects/visa-gcp-network/regions/us-central1/externalVpnGateways/peer-vpn-gateway"
+peer_gateway_ip_0       = "192.168.10.75"
+peer_gateway_ip_1       = "192.168.10.74"
 vpn_shared_secrets      = ["changeme-secret1", "changeme-secret2"]
 vpn_interface_ip_ranges = ["169.254.0.1/30", "169.254.0.5/30"]
 vpn_peer_ip_addresses   = ["169.254.0.2", "169.254.0.6"]
