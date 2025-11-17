@@ -13,8 +13,13 @@ variable "vpn_region" {
   type        = string
 }
 
-variable "peer_vpn_gateway_id" {
-  description = "Peer VPN gateway ID"
+variable "peer_gateway_ip_0" {
+  description = "Peer VPN gateway interface 0 IP address"
+  type        = string
+}
+
+variable "peer_gateway_ip_1" {
+  description = "Peer VPN gateway interface 1 IP address"
   type        = string
 }
 
