@@ -1,8 +1,8 @@
 # Hybrid connectivity configuration
 region = "us-central1"
 
-# HA VPN Configuration - Disabled: peer IPs must be public, not RFC1918 private IPs
-enable_vpn              = false
+# HA VPN Configuration - Using public IPs for peer gateway
+enable_vpn              = true
 vpn_region              = "us-central1"
 peer_gateway_ip_0       = "203.0.113.1"
 peer_gateway_ip_1       = "203.0.113.2"
