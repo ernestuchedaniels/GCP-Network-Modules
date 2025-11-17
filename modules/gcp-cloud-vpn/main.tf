@@ -44,6 +44,7 @@ resource "google_compute_router_peer" "bgp_peer" {
   peer_ip_address          = var.peer_ip_addresses[count.index]
   peer_asn                 = var.peer_asn
   advertised_route_priority = var.advertised_route_priority
+  advertise_mode           = length(var.advertised_ip_ranges) > 0 ? "CUSTOM" : "DEFAULT"
   interface                = google_compute_router_interface.router_interface[count.index].name
   
   dynamic "advertised_ip_ranges" {

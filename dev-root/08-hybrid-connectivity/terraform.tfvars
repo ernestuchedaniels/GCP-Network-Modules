@@ -1,7 +1,7 @@
 # Hybrid connectivity configuration
 region = "us-central1"
 
-# HA VPN Configuration
+# HA VPN Configuration 
 enable_vpn              = true
 vpn_region              = "us-central1"
 peer_gateway_ip_0       = "138.88.241.198"
