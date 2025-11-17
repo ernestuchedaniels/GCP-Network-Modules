@@ -1,7 +1,7 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "your-tfe-organization"
+    organization = "Visa-replica"
     workspaces {
       name = "dev-09-service-projects"
     }
@@ -22,11 +22,14 @@ locals {
 data "terraform_remote_state" "project_setup" {
   backend = "remote"
   config = {
-    workspace = "dev-01-project-setup"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "dev-01-project-setup"
+    }
   }
 }
 
-# Create Service Projects
+# Create Service Projects and attach to Shared VPC
 module "service_projects" {
   source = "../../modules/gcp-service-project"
   
@@ -37,19 +40,5 @@ module "service_projects" {
   billing_account  = each.value.billing_account
   host_project_id  = data.terraform_remote_state.project_setup.outputs.host_project_id
   org_id           = each.value.org_id
-  
-  labels = each.value.labels
-}
-
-# Attach Service Projects to Shared VPC
-module "shared_vpc_attachments" {
-  source = "../../modules/gcp-shared-vpc-attach"
-  
-  for_each = var.service_projects
-  
-  project_id             = data.terraform_remote_state.project_setup.outputs.host_project_id
-  host_project_id        = data.terraform_remote_state.project_setup.outputs.host_project_id
-  service_project_number = module.service_projects[each.key].project_number
-  
-  depends_on = [module.service_projects]
+  labels           = each.value.labels
 }

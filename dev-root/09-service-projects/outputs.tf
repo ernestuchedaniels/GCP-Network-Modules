@@ -1,9 +1,13 @@
-output "app_service_project_id" {
-  description = "The service project ID"
-  value       = module.app_service_project.project_id
+output "service_project_ids" {
+  description = "Map of service project IDs"
+  value = {
+    for k, v in module.service_projects : k => v.project_id
+  }
 }
 
-output "app_service_project_number" {
-  description = "The service project number"
-  value       = module.app_service_project.project_number
+output "service_project_numbers" {
+  description = "Map of service project numbers"
+  value = {
+    for k, v in module.service_projects : k => v.project_number
+  }
 }

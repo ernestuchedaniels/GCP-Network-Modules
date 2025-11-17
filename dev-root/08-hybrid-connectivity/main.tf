@@ -1,7 +1,7 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "your-tfe-organization"
+    organization = "Visa-replica"
     workspaces {
       name = "dev-08-hybrid-connectivity"
     }
@@ -22,70 +22,50 @@ locals {
 data "terraform_remote_state" "project_setup" {
   backend = "remote"
   config = {
-    workspace = "dev-01-project-setup"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "dev-01-project-setup"
+    }
   }
 }
 
 data "terraform_remote_state" "networking_core" {
   backend = "remote"
   config = {
-    workspace = "dev-02-networking-core"
+    organization = "Visa-replica"
+    workspaces = {
+      name = "dev-02-networking-core"
+    }
   }
 }
 
-data "terraform_remote_state" "networking_dmz" {
-  backend = "remote"
-  config = {
-    workspace = "dev-03-networking-dmz"
-  }
-}
-
-# Create Cloud Router for Core VPC
-module "cloud_router_core" {
+# Create Cloud Router for HA VPN
+module "cloud_router" {
   source = "../../modules/gcp-cloud-router"
   
   project_id   = data.terraform_remote_state.project_setup.outputs.host_project_id
-  router_name  = "${local.environment}-core-hybrid-router"
+  router_name  = "${local.environment}-vpn-router"
   network_link = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
   region       = var.region
-  description  = "Cloud Router for core VPC hybrid connectivity"
+  description  = "Cloud Router for HA VPN"
 }
 
-# Create Cloud Router for DMZ VPC
-module "cloud_router_dmz" {
-  source = "../../modules/gcp-cloud-router"
+# Create HA VPN Gateway
+module "ha_vpn" {
+  source = "../../modules/gcp-cloud-vpn"
   
-  project_id   = data.terraform_remote_state.networking_dmz.outputs.dmz_host_project_id
-  router_name  = "${local.environment}-dmz-hybrid-router"
-  network_link = data.terraform_remote_state.networking_dmz.outputs.dmz_vpc_self_link
-  region       = var.region
-  description  = "Cloud Router for DMZ VPC hybrid connectivity"
-}
-
-# Create NCC Hub
-module "ncc_hub" {
-  source = "../../modules/gcp-ncc-hub"
+  count = var.enable_vpn ? 1 : 0
   
-  project_id  = data.terraform_remote_state.project_setup.outputs.host_project_id
-  hub_name    = "${local.environment}-ncc-hub"
-  description = "NCC Hub for ${local.environment} environment"
-  
-  labels = {
-    environment = local.environment
-  }
-}
-
-# Create Interconnect VLAN Attachments for Core VPC
-module "interconnect_vlans_core" {
-  source = "../../modules/gcp-interconnect-vlan"
-  
-  for_each = var.vlan_attachments
-  
-  project_id        = data.terraform_remote_state.project_setup.outputs.host_project_id
-  router_name       = module.cloud_router_core.router_name
-  region            = each.value.region
-  interconnect_name = each.value.name
-  type              = each.value.type
-  bandwidth         = each.value.bandwidth
-  description       = each.value.description
+  project_id           = data.terraform_remote_state.project_setup.outputs.host_project_id
+  region               = var.vpn_region
+  vpn_gateway_name     = "${local.environment}-vpn-gateway"
+  network_self_link    = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
+  tunnel_name_prefix   = "${local.environment}-vpn"
+  router_name          = module.cloud_router.router_name
+  peer_vpn_gateway_id  = var.peer_vpn_gateway_id
+  shared_secrets       = var.vpn_shared_secrets
+  interface_ip_ranges  = var.vpn_interface_ip_ranges
+  peer_ip_addresses    = var.vpn_peer_ip_addresses
+  peer_asn             = var.vpn_peer_asn
+  advertised_ip_ranges = var.vpn_advertised_ip_ranges
 }

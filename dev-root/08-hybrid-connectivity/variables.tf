@@ -1,20 +1,48 @@
 variable "region" {
-  description = "GCP region"
+  description = "GCP region for Cloud Router"
   type        = string
 }
 
-variable "asn_number" {
-  description = "BGP ASN number"
+variable "enable_vpn" {
+  description = "Enable HA VPN"
+  type        = bool
+}
+
+variable "vpn_region" {
+  description = "GCP region for VPN resources"
+  type        = string
+}
+
+variable "peer_vpn_gateway_id" {
+  description = "Peer VPN gateway ID"
+  type        = string
+}
+
+variable "vpn_shared_secrets" {
+  description = "Shared secrets for VPN tunnels"
+  type        = list(string)
+  sensitive   = true
+}
+
+variable "vpn_interface_ip_ranges" {
+  description = "IP ranges for VPN router interfaces"
+  type        = list(string)
+}
+
+variable "vpn_peer_ip_addresses" {
+  description = "Peer IP addresses for BGP"
+  type        = list(string)
+}
+
+variable "vpn_peer_asn" {
+  description = "Peer ASN for BGP"
   type        = number
 }
 
-variable "vlan_attachments" {
-  description = "Map of VLAN attachments to create"
-  type = map(object({
-    name        = string
-    region      = string
-    type        = string
-    bandwidth   = string
+variable "vpn_advertised_ip_ranges" {
+  description = "IP ranges to advertise via BGP"
+  type = list(object({
+    range       = string
     description = string
   }))
 }

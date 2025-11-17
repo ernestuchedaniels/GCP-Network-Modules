@@ -1,14 +1,14 @@
-output "router_self_link" {
-  description = "Self-link of the cloud router"
-  value       = module.cloud_router.router_self_link
+output "cloud_router_name" {
+  description = "Name of the Cloud Router"
+  value       = module.cloud_router.router_name
 }
 
-output "vlan_attachment_link" {
-  description = "Self-link of the VLAN attachment"
-  value       = module.interconnect_vlan.vlan_self_link
+output "vpn_gateway_id" {
+  description = "ID of the HA VPN Gateway"
+  value       = var.enable_vpn ? module.ha_vpn[0].vpn_gateway_id : null
 }
 
-output "ncc_hub_id" {
-  description = "ID of the NCC hub"
-  value       = module.ncc_hub.hub_id
+output "vpn_gateway_self_link" {
+  description = "Self link of the HA VPN Gateway"
+  value       = var.enable_vpn ? module.ha_vpn[0].vpn_gateway_self_link : null
 }
