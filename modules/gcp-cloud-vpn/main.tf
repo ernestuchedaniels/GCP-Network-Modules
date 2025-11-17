@@ -10,14 +10,15 @@ resource "google_compute_ha_vpn_gateway" "vpn_gateway" {
 resource "google_compute_vpn_tunnel" "tunnels" {
   count = 2
   
-  name                  = "${var.tunnel_name_prefix}-tunnel-${count.index + 1}"
-  region                = var.region
-  project               = var.project_id
-  router                = var.router_name
-  vpn_gateway           = google_compute_ha_vpn_gateway.vpn_gateway.id
-  peer_gcp_gateway      = var.peer_vpn_gateway_id
-  shared_secret         = var.shared_secrets[count.index]
-  vpn_gateway_interface = count.index
+  name                            = "${var.tunnel_name_prefix}-tunnel-${count.index + 1}"
+  region                          = var.region
+  project                         = var.project_id
+  router                          = var.router_name
+  vpn_gateway                     = google_compute_ha_vpn_gateway.vpn_gateway.id
+  peer_external_gateway           = var.peer_vpn_gateway_id
+  peer_external_gateway_interface = count.index
+  shared_secret                   = var.shared_secrets[count.index]
+  vpn_gateway_interface           = count.index
 }
 
 # Create Router Interface
