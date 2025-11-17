@@ -2,6 +2,12 @@
 
 Creates a DNS record in a Cloud DNS managed zone.
 
+## Features
+
+- Simplified user experience with default TTL (300 seconds)
+- TTL is optional - no need to specify in tfvars unless you need a custom value
+- Supports all DNS record types (A, AAAA, CNAME, MX, TXT, etc.)
+
 ## Usage
 
 ```hcl
@@ -13,7 +19,7 @@ module "dns_a_record" {
   record_name = "app.example.com."
   record_type = "A"
   rrdatas     = ["10.0.1.10"]
-  ttl         = 300
+  # ttl defaults to 300 seconds - only specify if you need a different value
 }
 ```
 
