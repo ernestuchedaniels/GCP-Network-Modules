@@ -7,14 +7,14 @@ psc_google_apis = {
 }
 
 # Google API PSC Endpoints (regional) - Commented out pending service attachment resolution
-# psc_google_apis_regional = {
+psc_google_apis_regional = {
 #   storage = {
 #     target        = "storage.us-west1.p.gcp-sa.net"
 #     region        = "us-west1"
 #     app_name      = "cache"
 #     global_access = true
 #   }
-# }
+}
 
 # Third-party PSC Service Attachments (regional)
 psc_service_attachments = {
