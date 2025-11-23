@@ -1,9 +1,9 @@
 # Google API PSC Endpoints (global)
 psc_google_apis = {
-  allapis = {
-    target     = "all-apis"
-    ip_address = "10.10.100.1"
-  }
+  # allapis = {
+  #   target     = "all-apis"
+  #   ip_address = "10.10.100.1"
+  # }
 }
 
 # Google API PSC Endpoints (regional) - Commented out pending service attachment resolution
