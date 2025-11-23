@@ -1,7 +1,7 @@
 # Test change for dev-02-networking-core workspace
 # Region validation test with clean CIDR blocks
 subnets = {
-  primary = {
+ web = {
     app_name                 = "web"
     cidr_block              = "10.10.0.0/24"
     region                  = "us-central1"
@@ -18,7 +18,7 @@ subnets = {
       }
     ]
   }
-  secondary = {
+  api = {
     app_name                 = "api"
     cidr_block              = "10.10.1.0/24"
     region                  = "us-central1"
@@ -45,14 +45,6 @@ subnets = {
   lb = {
     app_name                 = "lb"
     cidr_block              = "10.10.4.0/24"
-    region                  = "us-west1"
-    private_ip_google_access = true
-    description             = "Load balancer subnet for dev environment"
-    secondary_ranges        = []
-  }
-  demo = {
-    app_name                 = "cj-demo"
-    cidr_block              = "10.10.5.0/24"
     region                  = "us-west1"
     private_ip_google_access = true
     description             = "Load balancer subnet for dev environment"

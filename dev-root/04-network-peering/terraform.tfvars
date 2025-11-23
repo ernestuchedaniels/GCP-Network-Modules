@@ -2,6 +2,7 @@
 project_id = "visa-gcp-network"
 
 # VPC Peering connections configuration
+#RE-deployment-note: Updated peering names to include 'dev' prefix for clarity.
 vpc_peering_connections = {
   core_to_dmz = {
     peering_name         = "dev-core-to-dmz"
