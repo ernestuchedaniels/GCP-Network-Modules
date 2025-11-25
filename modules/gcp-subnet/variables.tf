@@ -44,3 +44,13 @@ variable "secondary_ranges" {
   default = []
 }
 
+variable "name_override" {
+  description = "Override subnet name (for migration purposes)"
+  type        = string
+  default     = null
+}
+
+
+
+
+

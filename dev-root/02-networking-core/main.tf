@@ -1,6 +1,5 @@
 terraform {
-  backend "remote" {
-    hostname     = "app.terraform.io"
+  cloud {
     organization = "Visa-replica"
     workspaces {
       name = "dev-02-networking-core"
@@ -36,15 +35,23 @@ data "terraform_remote_state" "project_setup" {
   }
 }
 
-# Create VPC Network
-module "main_vpc" {
+# Create all VPCs from tfvars
+module "vpcs" {
   source = "../../modules/gcp-vpc"
   
-  project_id              = data.terraform_remote_state.project_setup.outputs.host_project_id
-  network_name            = "${local.environment}-shared-vpc"
-  auto_create_subnetworks = false
-  routing_mode            = "REGIONAL"
-  description             = "Shared VPC for ${local.environment} environment"
+  for_each = var.vpcs
+  
+  project_id              = each.value.project_id
+  network_name            = each.value.network_name
+  auto_create_subnetworks = each.value.auto_create_subnetworks
+  routing_mode            = each.value.routing_mode
+  description             = each.value.description
+}
+
+# Migration blocks to preserve existing resources
+moved {
+  from = module.main_vpc
+  to   = module.vpcs["main_vpc"]
 }
 
 # Create Subnets
@@ -53,13 +60,14 @@ module "subnets" {
   
   for_each = var.subnets
   
-  project_id                = data.terraform_remote_state.project_setup.outputs.host_project_id
+  project_id                = var.vpcs[each.value.vpc_key].project_id
   app_name                  = each.value.app_name
   cidr_block                = each.value.cidr_block
   region                    = each.value.region
-  vpc_link                  = module.main_vpc.vpc_self_link
+  vpc_link                  = module.vpcs[each.value.vpc_key].vpc_self_link
   private_ip_google_access  = each.value.private_ip_google_access
   description               = each.value.description
+  name_override             = lookup(var.subnet_name_overrides, each.key, null)
   
   secondary_ranges = each.value.secondary_ranges
 }

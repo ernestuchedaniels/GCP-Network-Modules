@@ -1,6 +1,17 @@
 # Hybrid connectivity configuration
 region = "us-central1"
 
+# Cloud Routers configuration
+cloud_routers = {
+  test_router = {
+    project_id  = "visa-gcp-network"
+    name        = "test-router"
+    network     = "test-vpc-1"
+    region      = "us-central1"
+    description = "Test router for import testing"
+  }
+}
+
 # HA VPN Configuration - values required even though resources are commented out
 enable_vpn              = false
 vpn_region              = "us-central1"

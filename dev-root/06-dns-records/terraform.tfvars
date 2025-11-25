@@ -29,4 +29,32 @@ dns_records = {
   #   type         = "CNAME"
   #   rrdatas      = ["api.internal.visa.com."]  # CNAME: target domain
   # }
+  test_api_record = {
+    project_id   = "visa-gcp-network"
+    dns_suffix   = "test1.internal."
+    record_name  = "api"
+    type         = "A"
+    rrdatas      = ["10.1.0.10"]
+  }
+  test_web_record = {
+    project_id   = "visa-gcp-network"
+    dns_suffix   = "test1.internal."
+    record_name  = "web"
+    type         = "A"
+    rrdatas      = ["10.1.0.20"]
+  }
+  test_db_record = {
+    project_id   = "visa-gcp-network"
+    dns_suffix   = "test2.internal."
+    record_name  = "db"
+    type         = "A"
+    rrdatas      = ["10.2.0.10"]
+  }
+  test_app_cname = {
+    project_id   = "visa-gcp-network"
+    dns_suffix   = "test2.internal."
+    record_name  = "app"
+    type         = "CNAME"
+    rrdatas      = ["api.test1.internal."]
+  }
 }

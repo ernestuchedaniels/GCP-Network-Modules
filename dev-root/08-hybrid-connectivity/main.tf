@@ -42,16 +42,18 @@ data "terraform_remote_state" "networking_core" {
 # All resources commented out to destroy everything
 # Uncomment to recreate resources
 
-# # Create Cloud Router for HA VPN
-# module "cloud_router" {
-#   source = "../../modules/gcp-cloud-router"
-#   
-#   project_id   = data.terraform_remote_state.project_setup.outputs.host_project_id
-#   router_name  = "${local.environment}-vpn-router"
-#   network_link = data.terraform_remote_state.networking_core.outputs.main_vpc_self_link
-#   region       = var.region
-#   description  = "Cloud Router for HA VPN"
-# }
+# Create Cloud Routers
+module "cloud_routers" {
+  source = "../../modules/gcp-cloud-router"
+  
+  for_each = var.cloud_routers
+  
+  project_id   = each.value.project_id
+  router_name  = each.value.name
+  network_link = "projects/${each.value.project_id}/global/networks/${each.value.network}"
+  region       = each.value.region
+  description  = each.value.description
+}
 
 # # Create External VPN Gateway
 # resource "google_compute_external_vpn_gateway" "peer_gateway" {
