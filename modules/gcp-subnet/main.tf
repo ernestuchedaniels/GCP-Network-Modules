@@ -6,12 +6,13 @@ locals {
 }
 
 resource "random_id" "subnet_suffix" {
+  count       = var.name_override == null ? 1 : 0
   byte_length = 2
 }
 
 resource "google_compute_subnetwork" "subnet" {
   project                  = var.project_id
-  name                     = "${var.app_name}-subnet-${random_id.subnet_suffix.hex}"
+  name                     = var.name_override != null ? var.name_override : "${var.app_name}-subnet-${random_id.subnet_suffix[0].hex}"
   ip_cidr_range            = var.cidr_block
   region                   = var.region
   network                  = var.vpc_link

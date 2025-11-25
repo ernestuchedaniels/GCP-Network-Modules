@@ -12,6 +12,30 @@ dns_zones = {
   #     purpose     = "internal-dns"
   #   }
   # }
+  test_zone_1 = {
+    project_id   = "visa-gcp-network"
+    zone_name    = "test-zone-1"
+    dns_suffix   = "test1.internal."
+    description  = "Test zone 1 for import"
+    visibility   = "public"
+    vpc_networks = []
+    labels = {
+      environment = "dev"
+      purpose     = "import-test"
+    }
+  }
+  test_zone_2 = {
+    project_id   = "visa-gcp-network"
+    zone_name    = "test-zone-2"
+    dns_suffix   = "test2.internal."
+    description  = "Test zone 2 for import"
+    visibility   = "public"
+    vpc_networks = []
+    labels = {
+      environment = "dev"
+      purpose     = "import-test"
+    }
+  }
 }
 
 # DNS Forwarding Policies configuration

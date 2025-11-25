@@ -51,3 +51,13 @@ variable "vpn_advertised_ip_ranges" {
     description = string
   }))
 }
+variable "cloud_routers" {
+  description = "value"
+  type = map(object({
+    project_id  = string
+    name        = string
+    network     = string
+    region      = string
+    description = string
+  }))
+}

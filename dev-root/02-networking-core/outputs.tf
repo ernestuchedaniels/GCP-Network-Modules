@@ -1,6 +1,6 @@
 output "main_vpc_self_link" {
   description = "Self-link of the main VPC"
-  value       = module.main_vpc.vpc_self_link
+  value       = module.vpcs["main_vpc"].vpc_self_link
 }
 
 output "subnets" {
